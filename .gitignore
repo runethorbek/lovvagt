@@ -68,7 +68,6 @@ web_modules/
 # dotenv environment variable files
 .env
 .env.*
-!.env.example
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -149,3 +148,13 @@ vite.config.ts.timestamp-*
 .turbo
 .vercel
 .env*
+!.env.example
+
+# Next.js generated types
+next-env.d.ts
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

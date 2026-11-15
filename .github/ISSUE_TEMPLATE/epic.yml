@@ -1,0 +1,35 @@
+name: Epic
+description: A larger piece of work defined by a spec and split into sub-issues.
+title: "[Epic] "
+labels: ["type:epic"]
+body:
+  - type: input
+    id: spec
+    attributes:
+      label: Spec
+      description: Link to the spec in `specs/`.
+      placeholder: specs/001-ingest.md
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What is true when this epic is done?
+    validations:
+      required: true
+  - type: textarea
+    id: sub-issues
+    attributes:
+      label: Expected sub-issues
+      description: One line per expected task issue. Link them as they are created.
+      value: |
+        - [ ] 
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+    validations:
+      required: true
