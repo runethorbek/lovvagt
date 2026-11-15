@@ -114,7 +114,12 @@ Relevant facts:
   "ok": true,
   "checks": {
     "database": { "ok": true, "latencyMs": 42, "fingerprint": "a1b2c3d4" },
-    "blob": { "ok": true, "latencyMs": 120, "tokenVariable": "BLOB_READ_WRITE_TOKEN", "fingerprint": "e5f6a7b8" },
+    "blob": {
+      "ok": true,
+      "latencyMs": 120,
+      "tokenVariable": "BLOB_READ_WRITE_TOKEN",
+      "fingerprint": "e5f6a7b8"
+    },
     "gemini": { "ok": true, "latencyMs": 800, "model": "<model-id>" }
   }
 }
