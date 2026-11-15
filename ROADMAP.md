@@ -10,6 +10,7 @@ Update **Where we are** at the end of every work session.
 **Current phase:** 1 – Connectivity (spec 001)
 
 **Next action:**
+
 1. Finish spec 001 prerequisite B: add `CRON_SECRET` in Vercel
    (Production: sensitive; Preview + Development: not sensitive),
    then `vercel env pull .env.local`.
@@ -44,17 +45,17 @@ notifications, multi-tenant accounts, EU legislation.
 
 Status: ✅ done · 🟡 in progress · ⬜ not started
 
-| # | Phase | Spec | Status |
-|---|---|---|---|
-| 0 | Foundation: infrastructure, dev container, CI, CLAUDE.md, templates | 000 | ✅ |
-| 1 | Connectivity: config, database, blob, Gemini access layers + health check | 001 | 🟡 |
-| 2 | Ingest: fetch cases, stages, votes and documents for tracked topics from ODA; store originals in Blob | 002 | ⬜ |
-| 3 | Transform: extract text (prefer DOCX over PDF), split into sections, track document versions | 003 | ⬜ |
-| 4 | Enrich: topic classification, summaries with source references, extract consequences from the bill's general remarks | 004 | ⬜ |
-| 5 | Review: three independent reviewers (faithfulness, completeness, neutrality), deterministic decision rule, judge on disagreement, golden test set | 005 | ⬜ |
-| 6 | Events: detect stage changes, append-only event log, timelines | 006 | ⬜ |
-| 7 | Dashboard: tracked bills per topic, timelines, who is affected | 007 | ⬜ |
-| 8 | Automation: daily Vercel Cron → Workflow; agents triggered from issues | 008 | ⬜ |
+| #   | Phase                                                                                                                                             | Spec | Status |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ------ |
+| 0   | Foundation: infrastructure, dev container, CI, CLAUDE.md, templates                                                                               | 000  | ✅     |
+| 1   | Connectivity: config, database, blob, Gemini access layers + health check                                                                         | 001  | 🟡     |
+| 2   | Ingest: fetch cases, stages, votes and documents for tracked topics from ODA; store originals in Blob                                             | 002  | ⬜     |
+| 3   | Transform: extract text (prefer DOCX over PDF), split into sections, track document versions                                                      | 003  | ⬜     |
+| 4   | Enrich: topic classification, summaries with source references, extract consequences from the bill's general remarks                              | 004  | ⬜     |
+| 5   | Review: three independent reviewers (faithfulness, completeness, neutrality), deterministic decision rule, judge on disagreement, golden test set | 005  | ⬜     |
+| 6   | Events: detect stage changes, append-only event log, timelines                                                                                    | 006  | ⬜     |
+| 7   | Dashboard: tracked bills per topic, timelines, who is affected                                                                                    | 007  | ⬜     |
+| 8   | Automation: daily Vercel Cron → Workflow; agents triggered from issues                                                                            | 008  | ⬜     |
 
 ## Phase 0 checklist (done)
 
@@ -71,19 +72,19 @@ Status: ✅ done · 🟡 in progress · ⬜ not started
 Things that are known but not yet handled. Move them into a spec when
 they become relevant.
 
-| Item | Needed before |
-|---|---|
-| Verify `ci` is a required status check in the `main` ruleset | Phase 1 implementation |
-| Verify pull requests get Vercel preview deployments | Phase 1 implementation |
-| Preview database isolation: Preview may point to the production database; enable Neon branch per preview or give Preview its own branch | Any migration (phase 2) |
-| Clean up Neon preview branches (free plan: 10 branches per project) | Phase 2 |
-| Preview deployment protection bypass for automated browser tests | Phase 7 |
-| Dev container: host Git credentials are forwarded, so the scoped GitHub token is not airtight | Agent automation (phase 8) |
-| Dev container: network firewall (see Anthropic's reference dev container) | Agent automation (phase 8) |
-| Restrict Gemini keys to the Generative Language API in Google Cloud (verify) | Phase 4 |
-| Watch Blob quota (1 GB, 2,000 uploads/month on Hobby); backfill must be spread out | Phase 2 |
-| Consider moving the repo into the WSL file system if the container feels slow | Any time |
-| Vercel Hobby is for non-commercial use; revisit if Lovvagt becomes a product | Before any commercial use |
+| Item                                                                                                                                    | Needed before              |
+| --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| Verify `ci` is a required status check in the `main` ruleset                                                                            | Phase 1 implementation     |
+| Verify pull requests get Vercel preview deployments                                                                                     | Phase 1 implementation     |
+| Preview database isolation: Preview may point to the production database; enable Neon branch per preview or give Preview its own branch | Any migration (phase 2)    |
+| Clean up Neon preview branches (free plan: 10 branches per project)                                                                     | Phase 2                    |
+| Preview deployment protection bypass for automated browser tests                                                                        | Phase 7                    |
+| Dev container: host Git credentials are forwarded, so the scoped GitHub token is not airtight                                           | Agent automation (phase 8) |
+| Dev container: network firewall (see Anthropic's reference dev container)                                                               | Agent automation (phase 8) |
+| Restrict Gemini keys to the Generative Language API in Google Cloud (verify)                                                            | Phase 4                    |
+| Watch Blob quota (1 GB, 2,000 uploads/month on Hobby); backfill must be spread out                                                      | Phase 2                    |
+| Consider moving the repo into the WSL file system if the container feels slow                                                           | Any time                   |
+| Vercel Hobby is for non-commercial use; revisit if Lovvagt becomes a product                                                            | Before any commercial use  |
 
 ## Working agreements
 
