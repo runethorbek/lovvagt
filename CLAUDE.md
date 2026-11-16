@@ -92,6 +92,15 @@ Everything else (code, comments, docs, issues, commits) is in English.
   in a comment, and stop.
 - Record architecture decisions in `docs/decisions/` (see ADR 0001).
 
+## Sessions
+
+- At the start of a session, read ROADMAP.md before doing anything else.
+- ROADMAP.md is the source of truth for project status. Never mark a
+  phase done unless its epic is closed and its acceptance criteria are met.
+- At the end of a session, or when an epic is closed, update ROADMAP.md
+  (Where we are, phase status, open items, session log) in a pull request.
+- Use the /status command to start a session and /wrap-up to end one.
+
 ## Definition of done
 
 - All acceptance criteria in the issue are met.
