@@ -1,6 +1,6 @@
 # 0003. Typed environment configuration
 
-**Status:** Accepted
+**Status:** Accepted (decision 6 is superseded by 0004)
 **Date:** 2026-11-16
 
 ## Context

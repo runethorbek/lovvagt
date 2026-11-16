@@ -6,8 +6,6 @@ const variables = [
   "VERCEL_ENV",
   "DATABASE_URL",
   "DATABASE_URL_UNPOOLED",
-  "BLOB_READ_WRITE_TOKEN",
-  "DEV_BLOB_READ_WRITE_TOKEN",
   "GEMINI_API_KEY",
   "CRON_SECRET",
 ];
@@ -16,8 +14,6 @@ const variables = [
 const secrets = {
   DATABASE_URL: "postgresql://user:pw-secret-1@db-host-secret/db",
   DATABASE_URL_UNPOOLED: "postgresql://user:pw-secret-2@db-host-secret/db",
-  BLOB_READ_WRITE_TOKEN: "blob-prod-secret-3",
-  DEV_BLOB_READ_WRITE_TOKEN: "blob-dev-secret-4",
   GEMINI_API_KEY: "gemini-secret-5",
   CRON_SECRET: "cron-secret-6",
 };
@@ -143,33 +139,5 @@ describe("grouped accessors", () => {
   });
 });
 
-describe("blobConfig", () => {
-  it("uses the production token in production", () => {
-    setAll();
-    vi.stubEnv("VERCEL_ENV", "production");
-    expect(blobConfig()).toEqual({
-      token: secrets.BLOB_READ_WRITE_TOKEN,
-      tokenVariable: "BLOB_READ_WRITE_TOKEN",
-    });
-  });
-
-  it.each(["preview", "development", undefined])(
-    "uses the dev token when VERCEL_ENV is %s",
-    (value) => {
-      setAll();
-      vi.stubEnv("VERCEL_ENV", value);
-      expect(blobConfig()).toEqual({
-        token: secrets.DEV_BLOB_READ_WRITE_TOKEN,
-        tokenVariable: "DEV_BLOB_READ_WRITE_TOKEN",
-      });
-    },
-  );
-
-  it("requires only the selected token", () => {
-    vi.stubEnv("VERCEL_ENV", "production");
-    vi.stubEnv("DEV_BLOB_READ_WRITE_TOKEN", secrets.DEV_BLOB_READ_WRITE_TOKEN);
-    expect(errorOf(() => blobConfig()).variables).toEqual([
-      "BLOB_READ_WRITE_TOKEN",
-    ]);
-  });
-});
+// blobConfig() is tested in blob.test.ts, the one test file allowed to name
+// the blob variables (see boundaries.test.ts).

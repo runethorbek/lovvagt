@@ -1,6 +1,6 @@
 # 0002. Stack and infrastructure
 
-**Status:** Accepted
+**Status:** Accepted (the blob token part of decision 4 is superseded by 0004)
 **Date:** 2026-11-15
 
 ## Context

@@ -28,8 +28,11 @@ Relevant facts:
 
 - Database: Neon Postgres, connection strings in `DATABASE_URL`
   (pooled) and `DATABASE_URL_UNPOOLED` (direct).
-- Blob: private stores. `BLOB_READ_WRITE_TOKEN` in Production,
-  `DEV_BLOB_READ_WRITE_TOKEN` in Development and Preview.
+- Blob: private stores, authenticated with Vercel OIDC (ADR 0004). The
+  store ID is `BLOB_STORE_ID` in Production and `DEV_BLOB_STORE_ID` in
+  Development and Preview (not secret). The credential is
+  `VERCEL_OIDC_TOKEN` (secret, short-lived; locally refreshed with
+  `vercel env pull .env.local`). There are no read-write tokens.
 - Gemini: `GEMINI_API_KEY`, free tier, separate Google projects per
   environment. Only Flash-class models are available on the free tier.
 - `VERCEL_ENV` is set by Vercel to `production`, `preview` or
@@ -77,15 +80,17 @@ Relevant facts:
 
 ### 3. Blob helper
 
-- One module that is the only place reading either blob token variable.
-  It selects `BLOB_READ_WRITE_TOKEN` in `production` and
-  `DEV_BLOB_READ_WRITE_TOKEN` otherwise.
+- One module that is the only place naming the blob variables. It
+  selects `BLOB_STORE_ID` in `production` and `DEV_BLOB_STORE_ID`
+  otherwise, reads `VERCEL_OIDC_TOKEN`, and passes `storeId` and
+  `oidcToken` explicitly on every SDK call.
 - Exposes the operations later code will need: put, get, delete, list
   by prefix. Stores are private.
 - A `checkBlob()` function that writes a small fixed object at
   `healthcheck/probe.txt`, reads it back, compares the content and
-  deletes it. Returns latency, the **name** of the token variable used
-  and a fingerprint (8-character SHA-256 prefix) of the store identity.
+  deletes it. Returns latency, the **name** of the store ID variable used
+  (`storeIdVariable`) and a fingerprint (8-character SHA-256 prefix) of
+  the store ID, including its `store_` prefix.
 
 ### 4. Gemini model adapter
 
@@ -117,7 +122,7 @@ Relevant facts:
     "blob": {
       "ok": true,
       "latencyMs": 120,
-      "tokenVariable": "BLOB_READ_WRITE_TOKEN",
+      "storeIdVariable": "BLOB_STORE_ID",
       "fingerprint": "e5f6a7b8"
     },
     "gemini": { "ok": true, "latencyMs": 800, "model": "<model-id>" }
@@ -151,8 +156,9 @@ Relevant facts:
 - [ ] All npm scripts from spec 000 pass, and CI is green.
 - [ ] No file outside the configuration module reads `process.env`
       (except framework-required files, which must be listed in the PR).
-- [ ] No file outside the blob helper references either blob token
-      variable.
+- [ ] No file outside the blob helper references any blob variable
+      (`BLOB_STORE_ID`, `DEV_BLOB_STORE_ID`, `VERCEL_OIDC_TOKEN`, and the
+      unused `BLOB_READ_WRITE_TOKEN` and `DEV_BLOB_READ_WRITE_TOKEN`).
 - [ ] No file outside the Gemini adapter imports the Gemini SDK.
 - [ ] Calling `/api/health` locally with the Development secret returns
       200 with `environment: development`.

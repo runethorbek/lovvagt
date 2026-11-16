@@ -1,6 +1,7 @@
 /**
  * Architecture boundaries: only the configuration module may read the
- * process environment. See ADR 0003 and CLAUDE.md.
+ * process environment, and only the blob helper may name the blob
+ * variables. See ADR 0003, ADR 0004 and CLAUDE.md.
  */
 import {
   mkdirSync,
@@ -40,6 +41,26 @@ const ignoredDirectories = new Set([
 // a regex so that this file does not match itself.
 const environmentAccess = /\bprocess\s*(\.\s*env\b|\[\s*["'`]env["'`]\s*\])/;
 
+/** The only places allowed to name the blob variables. */
+const blobModule = "lib/blob/";
+const blobTestFiles = ["tests/unit/blob.test.ts"];
+
+// Built at runtime so that this file's own source does not match the scan.
+const blobVariables = [
+  ["BLOB", "STORE", "ID"],
+  ["DEV", "BLOB", "STORE", "ID"],
+  ["VERCEL", "OIDC", "TOKEN"],
+  ["BLOB", "READ", "WRITE", "TOKEN"],
+  ["DEV", "BLOB", "READ", "WRITE", "TOKEN"],
+].map((parts) => parts.join("_"));
+
+// Whole-identifier matches: the production store ID name is a substring of the
+// development one, which must be reported only as the longer name.
+const blobVariablePatterns = blobVariables.map(
+  (name) =>
+    [name, new RegExp(`(?<![A-Za-z0-9_])${name}(?![A-Za-z0-9_])`)] as const,
+);
+
 function sourceFiles(root: string, directory = root): string[] {
   const files: string[] = [];
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
@@ -62,6 +83,21 @@ function findViolations(root: string): string[] {
     .filter((file) =>
       environmentAccess.test(readFileSync(join(root, file), "utf8")),
     )
+    .sort();
+}
+
+/** Returns `file: NAME, NAME` for each file outside the blob helper that names a blob variable. */
+function findBlobViolations(root: string): string[] {
+  const allowed = new Set(blobTestFiles);
+  return sourceFiles(root)
+    .filter((file) => !file.startsWith(blobModule) && !allowed.has(file))
+    .flatMap((file) => {
+      const content = readFileSync(join(root, file), "utf8");
+      const names = blobVariablePatterns
+        .filter(([, pattern]) => pattern.test(content))
+        .map(([name]) => name);
+      return names.length > 0 ? [`${file}: ${names.join(", ")}`] : [];
+    })
     .sort();
 }
 
@@ -102,6 +138,66 @@ describe("process environment boundary", () => {
       expect(findViolations(fixture)).toEqual([
         "app/api/bad.tsx",
         "lib/bad.ts",
+      ]);
+    });
+  });
+});
+
+describe("blob variable boundary", () => {
+  it("names the blob variables only in the blob helper and its tests", () => {
+    expect(findBlobViolations(repoRoot)).toEqual([]);
+  });
+
+  it("covers all five variable names", () => {
+    expect(blobVariables).toHaveLength(5);
+    expect(new Set(blobVariables).size).toBe(5);
+  });
+
+  it("scans the blob helper and its test file", () => {
+    const files = sourceFiles(repoRoot);
+    expect(files).toContain("lib/blob/config.ts");
+    for (const file of blobTestFiles) expect(files).toContain(file);
+  });
+
+  describe("on a fixture repository", () => {
+    let fixture: string;
+
+    afterEach(() => {
+      rmSync(fixture, { recursive: true, force: true });
+    });
+
+    function write(path: string, content: string) {
+      const full = join(fixture, path);
+      mkdirSync(join(full, ".."), { recursive: true });
+      writeFileSync(full, content);
+    }
+
+    it("fails on each variable name outside the blob helper", () => {
+      const [storeId, devStoreId, oidc, readWrite, devReadWrite] =
+        blobVariables;
+      fixture = mkdtempSync(join(tmpdir(), "lovvagt-boundaries-"));
+      write("lib/blob/config.ts", `const a = "${storeId}";`);
+      write("lib/blob/other.ts", `const a = "${devReadWrite}";`);
+      write("tests/unit/blob.test.ts", `const a = "${oidc}";`);
+      write("lib/a.ts", `const a = "${storeId}";`);
+      write("lib/b.ts", `const b = "${devStoreId}";`);
+      write("lib/c.ts", `const c = "${oidc}";`);
+      write("lib/d.ts", `const d = "${readWrite}";`);
+      write("app/e.tsx", `const e = "${devReadWrite}";`);
+      write("lib/f.ts", `const f = ["${storeId}", "${devStoreId}"];`);
+      write("lib/ok.ts", `const ok = "MY_${storeId}_X";`);
+      write("tests/unit/other.test.ts", `const t = "${oidc}";`);
+      write("node_modules/dep/index.js", `"${readWrite}";`);
+      write("README.md", `${storeId}`);
+
+      expect(findBlobViolations(fixture)).toEqual([
+        `app/e.tsx: ${devReadWrite}`,
+        `lib/a.ts: ${storeId}`,
+        `lib/b.ts: ${devStoreId}`,
+        `lib/c.ts: ${oidc}`,
+        `lib/d.ts: ${readWrite}`,
+        `lib/f.ts: ${storeId}, ${devStoreId}`,
+        `tests/unit/other.test.ts: ${oidc}`,
       ]);
     });
   });
