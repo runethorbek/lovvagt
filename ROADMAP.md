@@ -5,20 +5,22 @@ Update **Where we are** at the end of every work session.
 
 ## Where we are
 
-**Last updated:** 2026-11-15
+**Last updated:** 2026-11-16
 
 **Current phase:** 1 – Connectivity (spec 001)
 
 **Next action:**
 
-1. Finish spec 001 prerequisite B: add `CRON_SECRET` in Vercel
-   (Production: sensitive; Preview + Development: not sensitive),
-   then `vercel env pull .env.local`.
-2. Commit `specs/001-health-check.md` via a pull request.
-3. Ask the agent to break spec 001 into an epic with sub-issues
-   (steps 1–2 in the spec). Review the breakdown, then set `agent:ready`.
+1. Confirm the `CRON_SECRET` prerequisite on epic #4. A non-empty value is
+   in `.env.local`, but only the human can confirm that the Production value
+   differs from Preview + Development. Then tick it on the epic.
+2. Decide the open question on #4: drop Gemini from the "fingerprints/model
+   project differ" criterion, or add a non-sensitive project identifier.
+3. Set `agent:ready` on #9 (health endpoint and docs), the last sub-issue.
+4. After #9 is merged and deployed, verify the four deployment criteria of
+   spec 001 by hand, then close epic #4.
 
-**Blocked on:** nothing.
+**Blocked on:** human confirmation of the `CRON_SECRET` prerequisite (#9).
 
 ## How to resume after a break
 
@@ -74,8 +76,6 @@ they become relevant.
 
 | Item                                                                                                                                    | Needed before              |
 | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| Verify `ci` is a required status check in the `main` ruleset                                                                            | Phase 1 implementation     |
-| Verify pull requests get Vercel preview deployments                                                                                     | Phase 1 implementation     |
 | Preview database isolation: Preview may point to the production database; enable Neon branch per preview or give Preview its own branch | Any migration (phase 2)    |
 | Clean up Neon preview branches (free plan: 10 branches per project)                                                                     | Phase 2                    |
 | Preview deployment protection bypass for automated browser tests                                                                        | Phase 7                    |
@@ -83,6 +83,9 @@ they become relevant.
 | Dev container: network firewall (see Anthropic's reference dev container)                                                               | Agent automation (phase 8) |
 | Restrict Gemini keys to the Generative Language API in Google Cloud (verify)                                                            | Phase 4                    |
 | Watch Blob quota (1 GB, 2,000 uploads/month on Hobby); backfill must be spread out                                                      | Phase 2                    |
+| `npm audit`: high findings via `@vercel/blob` → `@vercel/oidc` → `@vercel/cli-config` → `zod@4.1.11`; moderate via eslint `minimatch`   | Any time (upstream fix)    |
+| Spec 001 epic #4: sub-issue checkboxes for #6, #7, #8 are stale; closed #8 and #14 still carry `agent:in-progress`                      | Closing epic #4            |
+| Gemini free-tier limits are not published per model; watch the AI Studio rate-limit dashboard (limits are per project)                  | Phase 4                    |
 | Consider moving the repo into the WSL file system if the container feels slow                                                           | Any time                   |
 | Vercel Hobby is for non-commercial use; revisit if Lovvagt becomes a product                                                            | Before any commercial use  |
 
@@ -101,6 +104,10 @@ they become relevant.
 
 Newest first. One or two lines per session.
 
+- **2026-11-16** – Added session protocol. Agent implemented spec 001
+  issues #5 (config), #6 (database), #7 (blob, OIDC), #8 (Gemini adapter,
+  `gemini-3.5-flash-lite`) and #14 (Neon driver upgrade). Only #9 (health
+  endpoint) remains.
 - **2026-11-15** – Chose the project and architecture. Set up GitHub,
   Vercel, Neon (with `dev` branch), Blob, Gemini and the dev container.
   Agent implemented spec 000. Wrote spec 001.
