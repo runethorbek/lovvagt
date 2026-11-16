@@ -74,10 +74,16 @@ Everything else (code, comments, docs, issues, commits) is in English.
   `config.cronSecret()`); add a new group there for new variables. See ADR 0003.
 - Local development only uses Development environment variables. Never use
   production credentials.
-- Blob tokens differ by environment: `BLOB_READ_WRITE_TOKEN` in Production,
-  `DEV_BLOB_READ_WRITE_TOKEN` in Development/Preview. Access Blob only through
-  the one helper in `lib/blob/` that selects the token from `VERCEL_ENV`
-  (`lib/blob/config.ts`). No other code may name the token variables.
+- Blob uses Vercel OIDC, not read-write tokens (ADR 0004). The store ID
+  differs by environment: `BLOB_STORE_ID` in Production, `DEV_BLOB_STORE_ID`
+  in Development/Preview; `VERCEL_OIDC_TOKEN` is the (secret, short-lived)
+  credential. Access Blob only through the helper in `lib/blob/`
+  (`lib/blob/index.ts`), which selects the store ID from `VERCEL_ENV`
+  (`lib/blob/config.ts`) and passes `storeId` and `oidcToken` explicitly on
+  every SDK call. No other code may import `@vercel/blob` or name
+  `BLOB_STORE_ID`, `DEV_BLOB_STORE_ID`, `VERCEL_OIDC_TOKEN`,
+  `BLOB_READ_WRITE_TOKEN` or `DEV_BLOB_READ_WRITE_TOKEN` (enforced by
+  `tests/unit/boundaries.test.ts`). Never pass SDK error messages on.
 - Access the database only through `lib/db.ts` (`db()` for queries,
   `checkDatabase()` for the health probe). No other code may import
   `@neondatabase/serverless` or call `config.database()`. Never pass driver
