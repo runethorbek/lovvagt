@@ -88,8 +88,13 @@ Everything else (code, comments, docs, issues, commits) is in English.
   `checkDatabase()` for the health probe). No other code may import
   `@neondatabase/serverless` or call `config.database()`. Never pass driver
   error messages on: they can contain the connection string.
-- Call Gemini only through the one model adapter, so models can be swapped per
-  task.
+- Call Gemini only through the model adapter `lib/model.ts` (`generateText()`
+  with a task name, `checkGemini()` for the health probe), so models can be
+  swapped per task. Model IDs live only in its `models` object, keyed by task;
+  add a key there for a new task. No other code may import `@google/genai`
+  (enforced by `tests/unit/boundaries.test.ts`) or call `config.gemini()`.
+  Catch `RateLimitError` (HTTP 429) to back off. Never pass SDK error
+  messages on, and never log the key.
 
 ## Workflow rules
 

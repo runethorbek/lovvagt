@@ -1,7 +1,8 @@
 /**
  * Architecture boundaries: only the configuration module may read the
- * process environment, and only the blob helper may name the blob
- * variables. See ADR 0003, ADR 0004 and CLAUDE.md.
+ * process environment, only the blob helper may name the blob variables,
+ * and only the model adapter may import the Gemini SDK. See ADR 0003,
+ * ADR 0004 and CLAUDE.md.
  */
 import {
   mkdirSync,
@@ -61,6 +62,21 @@ const blobVariablePatterns = blobVariables.map(
     [name, new RegExp(`(?<![A-Za-z0-9_])${name}(?![A-Za-z0-9_])`)] as const,
 );
 
+/** The only places allowed to import the Gemini SDK. */
+const modelModule = "lib/model.ts";
+const modelTestFiles = ["tests/unit/model.test.ts"];
+
+// Matches a module specifier for the Gemini SDK (and the legacy SDK) in any
+// import, export-from, dynamic import, require or vi.mock call. Built at
+// runtime so that this file's own source does not match the scan.
+const geminiPackages = [
+  ["@google", "genai"],
+  ["@google", "generative-ai"],
+].map((parts) => parts.join("/"));
+const geminiImport = new RegExp(
+  `["'\`](${geminiPackages.join("|")})(/[^"'\`]*)?["'\`]`,
+);
+
 function sourceFiles(root: string, directory = root): string[] {
   const files: string[] = [];
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
@@ -98,6 +114,15 @@ function findBlobViolations(root: string): string[] {
         .map(([name]) => name);
       return names.length > 0 ? [`${file}: ${names.join(", ")}`] : [];
     })
+    .sort();
+}
+
+/** Returns the repo-relative paths of files outside the model adapter that import the Gemini SDK. */
+function findGeminiViolations(root: string): string[] {
+  const allowed = new Set([modelModule, ...modelTestFiles]);
+  return sourceFiles(root)
+    .filter((file) => !allowed.has(file))
+    .filter((file) => geminiImport.test(readFileSync(join(root, file), "utf8")))
     .sort();
 }
 
@@ -198,6 +223,62 @@ describe("blob variable boundary", () => {
         `lib/d.ts: ${readWrite}`,
         `lib/f.ts: ${storeId}, ${devStoreId}`,
         `tests/unit/other.test.ts: ${oidc}`,
+      ]);
+    });
+  });
+});
+
+describe("Gemini SDK boundary", () => {
+  it("is imported only by the model adapter and its tests", () => {
+    expect(findGeminiViolations(repoRoot)).toEqual([]);
+  });
+
+  it("scans the model adapter and its test file", () => {
+    const files = sourceFiles(repoRoot);
+    expect(files).toContain(modelModule);
+    for (const file of modelTestFiles) expect(files).toContain(file);
+  });
+
+  it("is actually imported by the model adapter", () => {
+    const source = readFileSync(join(repoRoot, modelModule), "utf8");
+    expect(geminiImport.test(source)).toBe(true);
+  });
+
+  describe("on a fixture repository", () => {
+    let fixture: string;
+
+    afterEach(() => {
+      rmSync(fixture, { recursive: true, force: true });
+    });
+
+    function write(path: string, content: string) {
+      const full = join(fixture, path);
+      mkdirSync(join(full, ".."), { recursive: true });
+      writeFileSync(full, content);
+    }
+
+    it("fails on each form of import outside the model adapter", () => {
+      const [sdk, legacy] = geminiPackages;
+      fixture = mkdtempSync(join(tmpdir(), "lovvagt-boundaries-"));
+      write("lib/model.ts", `import { GoogleGenAI } from "${sdk}";`);
+      write("tests/unit/model.test.ts", `vi.mock("${sdk}");`);
+      write("lib/a.ts", `import { GoogleGenAI } from "${sdk}";`);
+      write("lib/b.ts", `export { ApiError } from '${sdk}';`);
+      write("lib/c.ts", `const m = await import(\`${sdk}/node\`);`);
+      write("lib/d.cjs", `const m = require("${legacy}");`);
+      write("app/e.tsx", `import type { Model } from "${sdk}";`);
+      write("tests/unit/other.test.ts", `vi.mock("${sdk}");`);
+      write("lib/ok.ts", `import { x } from "${sdk}-extra"; // ${sdk}`);
+      write("node_modules/dep/index.js", `require("${sdk}");`);
+      write("README.md", `"${sdk}"`);
+
+      expect(findGeminiViolations(fixture)).toEqual([
+        "app/e.tsx",
+        "lib/a.ts",
+        "lib/b.ts",
+        "lib/c.ts",
+        "lib/d.cjs",
+        "tests/unit/other.test.ts",
       ]);
     });
   });
