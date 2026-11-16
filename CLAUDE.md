@@ -67,12 +67,17 @@ Everything else (code, comments, docs, issues, commits) is in English.
 
 - Never read, print, log or commit values from `.env*` files. `.env.example`
   lists the variable names.
+- Read configuration only through `lib/config.ts`. No other source file may
+  use `process.env` (framework-required files are allow-listed in
+  `tests/unit/boundaries.test.ts`, which enforces this). Use the grouped
+  accessors (`config.environment()`, `config.database()`, `config.gemini()`,
+  `config.cronSecret()`); add a new group there for new variables. See ADR 0003.
 - Local development only uses Development environment variables. Never use
   production credentials.
 - Blob tokens differ by environment: `BLOB_READ_WRITE_TOKEN` in Production,
   `DEV_BLOB_READ_WRITE_TOKEN` in Development/Preview. Access Blob only through
-  the one helper that selects the token from `VERCEL_ENV`. Never use the token
-  variables directly anywhere else.
+  the one helper in `lib/blob/` that selects the token from `VERCEL_ENV`
+  (`lib/blob/config.ts`). No other code may name the token variables.
 - Call Gemini only through the one model adapter, so models can be swapped per
   task.
 
