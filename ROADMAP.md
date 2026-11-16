@@ -11,16 +11,21 @@ Update **Where we are** at the end of every work session.
 
 **Next action:**
 
-1. Confirm the `CRON_SECRET` prerequisite on epic #4. A non-empty value is
-   in `.env.local`, but only the human can confirm that the Production value
-   differs from Preview + Development. Then tick it on the epic.
-2. Decide the open question on #4: drop Gemini from the "fingerprints/model
-   project differ" criterion, or add a non-sensitive project identifier.
-3. Set `agent:ready` on #9 (health endpoint and docs), the last sub-issue.
-4. After #9 is merged and deployed, verify the four deployment criteria of
-   spec 001 by hand, then close epic #4.
+1. Confirm the `CRON_SECRET` prerequisite on epic #4 (Production value
+   differs from Preview + Development), pull `.env.local` again, and tick
+   it on the epic.
+2. Verify the four deployment criteria of spec 001 by hand, following
+   `docs/health-check.md`: local 200 with `environment: development`,
+   Production 200 with `environment: production`, database and blob
+   fingerprints differ, and 401 without the secret in both environments.
+3. Decide the open question on #4: drop Gemini from the "fingerprints/model
+   project differ" criterion (the endpoint shows only the model ID), or add
+   a non-sensitive project identifier.
+4. Tidy epic #4 (see Open items), then close it and mark phase 1 done.
+5. Write spec 002 (ingest).
 
-**Blocked on:** human confirmation of the `CRON_SECRET` prerequisite (#9).
+**Blocked on:** human verification of the spec 001 deployment criteria.
+All sub-issues (#5–#9, #14) are merged and closed.
 
 ## How to resume after a break
 
@@ -84,7 +89,7 @@ they become relevant.
 | Restrict Gemini keys to the Generative Language API in Google Cloud (verify)                                                            | Phase 4                    |
 | Watch Blob quota (1 GB, 2,000 uploads/month on Hobby); backfill must be spread out                                                      | Phase 2                    |
 | `npm audit`: high findings via `@vercel/blob` → `@vercel/oidc` → `@vercel/cli-config` → `zod@4.1.11`; moderate via eslint `minimatch`   | Any time (upstream fix)    |
-| Spec 001 epic #4: sub-issue checkboxes for #6, #7, #8 are stale; closed #8 and #14 still carry `agent:in-progress`                      | Closing epic #4            |
+| Spec 001 epic #4: sub-issue checkboxes for #6–#9 are unticked; closed #8, #9 and #14 still carry `agent:in-progress`                    | Closing epic #4            |
 | Gemini free-tier limits are not published per model; watch the AI Studio rate-limit dashboard (limits are per project)                  | Phase 4                    |
 | Consider moving the repo into the WSL file system if the container feels slow                                                           | Any time                   |
 | Vercel Hobby is for non-commercial use; revisit if Lovvagt becomes a product                                                            | Before any commercial use  |
@@ -106,8 +111,9 @@ Newest first. One or two lines per session.
 
 - **2026-11-16** – Added session protocol. Agent implemented spec 001
   issues #5 (config), #6 (database), #7 (blob, OIDC), #8 (Gemini adapter,
-  `gemini-3.5-flash-lite`) and #14 (Neon driver upgrade). Only #9 (health
-  endpoint) remains.
+  `gemini-3.5-flash-lite`), #14 (Neon driver upgrade) and #9 (protected
+  `GET /api/health` with 10 s per-check timeout, `docs/health-check.md`).
+  All spec 001 code is merged; deployment criteria await human checks.
 - **2026-11-15** – Chose the project and architecture. Set up GitHub,
   Vercel, Neon (with `dev` branch), Blob, Gemini and the dev container.
   Agent implemented spec 000. Wrote spec 001.
