@@ -78,6 +78,10 @@ Everything else (code, comments, docs, issues, commits) is in English.
   `DEV_BLOB_READ_WRITE_TOKEN` in Development/Preview. Access Blob only through
   the one helper in `lib/blob/` that selects the token from `VERCEL_ENV`
   (`lib/blob/config.ts`). No other code may name the token variables.
+- Access the database only through `lib/db.ts` (`db()` for queries,
+  `checkDatabase()` for the health probe). No other code may import
+  `@neondatabase/serverless` or call `config.database()`. Never pass driver
+  error messages on: they can contain the connection string.
 - Call Gemini only through the one model adapter, so models can be swapped per
   task.
 
