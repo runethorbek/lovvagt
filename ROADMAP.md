@@ -11,7 +11,9 @@ Update **Where we are** at the end of every work session.
 
 **Next action:**
 
-1. Write spec 002 (ingest from ODA), then break it down into an epic with
+1. Review and merge #28 (commit the generated `AGENTS.md`; it also removes
+   the `AGENTS.md` open item).
+2. Write spec 002 (ingest from ODA), then break it down into an epic with
    sub-issues for approval.
 
 **Blocked on:** spec 002 (human).
@@ -104,7 +106,8 @@ Newest first. One or two lines per session.
   misleading database auth error (#22). Gemini dropped from the
   "fingerprints differ" criterion. Gave Preview its own Neon `preview`
   branch (Preview removed from the Neon integration). Moved functions from
-  `iad1` to Frankfurt (`fra1`); Production health check re-verified.
+  `iad1` to Frankfurt (`fra1`); Production health check re-verified. Ticked
+  spec 001's criteria (#27) and opened #28 to commit `AGENTS.md`.
 - **2026-11-16** – Added session protocol. Agent implemented spec 001
   issues #5 (config), #6 (database), #7 (blob, OIDC), #8 (Gemini adapter,
   `gemini-3.5-flash-lite`), #14 (Neon driver upgrade) and #9 (protected
