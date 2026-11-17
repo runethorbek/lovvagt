@@ -42,10 +42,10 @@ Relevant facts:
 
 ## Prerequisites (human, before implementation starts)
 
-- [ ] Confirm whether Development uses a separate Neon database or
+- [x] Confirm whether Development uses a separate Neon database or
       branch from Production. If not, fix it before any sub-issue that
       touches the database is set to `agent:ready`.
-- [ ] Add `CRON_SECRET` in Vercel with a **different** random value for
+- [x] Add `CRON_SECRET` in Vercel with a **different** random value for
       Production and for Preview + Development, then run
       `vercel env pull .env.local` again.
 
@@ -153,24 +153,24 @@ Relevant facts:
 
 ## Acceptance criteria
 
-- [ ] All npm scripts from spec 000 pass, and CI is green.
-- [ ] No file outside the configuration module reads `process.env`
+- [x] All npm scripts from spec 000 pass, and CI is green.
+- [x] No file outside the configuration module reads `process.env`
       (except framework-required files, which must be listed in the PR).
-- [ ] No file outside the blob helper references any blob variable
+- [x] No file outside the blob helper references any blob variable
       (`BLOB_STORE_ID`, `DEV_BLOB_STORE_ID`, `VERCEL_OIDC_TOKEN`, and the
       unused `BLOB_READ_WRITE_TOKEN` and `DEV_BLOB_READ_WRITE_TOKEN`).
-- [ ] No file outside the Gemini adapter imports the Gemini SDK.
-- [ ] Calling `/api/health` locally with the Development secret returns
+- [x] No file outside the Gemini adapter imports the Gemini SDK.
+- [x] Calling `/api/health` locally with the Development secret returns
       200 with `environment: development`.
-- [ ] Calling `/api/health` in Production with the Production secret
+- [x] Calling `/api/health` in Production with the Production secret
       returns 200 with `environment: production`.
-- [ ] Database and blob fingerprints differ between Development and
+- [x] Database and blob fingerprints differ between Development and
       Production. (Amended 2026-11-17 by the human, see epic #4: Gemini was
       dropped from this criterion, because the response shows only the model
       ID and anything derived from the key would be sensitive. That the keys
       come from separate Google projects is checked by hand in the Vercel
       dashboard.)
-- [ ] Calling `/api/health` without the secret returns 401 in both
+- [x] Calling `/api/health` without the secret returns 401 in both
       environments.
 
 The last four criteria are verified by the human after deployment.
