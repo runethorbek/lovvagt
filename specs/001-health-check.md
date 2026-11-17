@@ -1,6 +1,6 @@
 # Spec 001 – Health check for external services
 
-**Status:** Ready for breakdown
+**Status:** Done (epic #4 closed 2026-11-17)
 **Owner:** Rune (human)
 **Implementer:** Claude Code (agent), via epic and sub-issues
 
@@ -164,9 +164,12 @@ Relevant facts:
       200 with `environment: development`.
 - [ ] Calling `/api/health` in Production with the Production secret
       returns 200 with `environment: production`.
-- [ ] Database, blob and Gemini fingerprints/model project differ between
-      Development and Production (database and blob fingerprints must
-      differ).
+- [ ] Database and blob fingerprints differ between Development and
+      Production. (Amended 2026-11-17 by the human, see epic #4: Gemini was
+      dropped from this criterion, because the response shows only the model
+      ID and anything derived from the key would be sensitive. That the keys
+      come from separate Google projects is checked by hand in the Vercel
+      dashboard.)
 - [ ] Calling `/api/health` without the secret returns 401 in both
       environments.
 
