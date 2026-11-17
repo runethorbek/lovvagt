@@ -109,6 +109,128 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
+  setRequestContext(undefined);
+});
+
+// Vercel Functions expose the current request through this global; the real
+// `@vercel/oidc` reads the token header from it.
+const requestContextKey = Symbol.for("@vercel/request-context");
+const requestToken = "eyJ.request-token-secret-321.sig";
+sensitive.push(requestToken, "request-token-secret-321");
+
+/** Simulates a request in a Vercel Function, or removes it with `undefined`. */
+function setRequestContext(headers: Record<string, string> | undefined) {
+  const global = globalThis as Record<symbol, unknown>;
+  if (headers === undefined) delete global[requestContextKey];
+  else global[requestContextKey] = { get: () => ({ headers }) };
+}
+
+describe("OIDC token at runtime", () => {
+  function storeOnly(vercelEnv: string) {
+    vi.stubEnv("VERCEL_ENV", vercelEnv);
+    vi.stubEnv("BLOB_STORE_ID", prodStoreId);
+    vi.stubEnv("DEV_BLOB_STORE_ID", devStoreId);
+  }
+
+  it("uses the request header when the variable is not set", () => {
+    storeOnly("production");
+    setRequestContext({ "x-vercel-oidc-token": requestToken });
+    expect(blobConfig()).toEqual({
+      storeId: prodStoreId,
+      storeIdVariable: "BLOB_STORE_ID",
+      oidcToken: requestToken,
+    });
+  });
+
+  it("prefers the request header over the variable", () => {
+    useEnvironment("production");
+    setRequestContext({ "x-vercel-oidc-token": requestToken });
+    expect(blobConfig().oidcToken).toBe(requestToken);
+  });
+
+  it("falls back to the variable when the header is missing or blank", () => {
+    useEnvironment("development");
+    setRequestContext({});
+    expect(blobConfig().oidcToken).toBe(oidcToken);
+    setRequestContext({ "x-vercel-oidc-token": "  " });
+    expect(blobConfig().oidcToken).toBe(oidcToken);
+  });
+
+  it("names the variable when neither header nor variable has a token", () => {
+    storeOnly("production");
+    setRequestContext({});
+    try {
+      blobConfig();
+      expect.unreachable();
+    } catch (error) {
+      expect(error).toBeInstanceOf(ConfigError);
+      expect((error as InstanceType<typeof ConfigError>).variables).toEqual([
+        "VERCEL_OIDC_TOKEN",
+      ]);
+    }
+  });
+
+  it("still requires the store ID when the header has a token", () => {
+    vi.stubEnv("VERCEL_ENV", "production");
+    setRequestContext({ "x-vercel-oidc-token": requestToken });
+    expect(() => blobConfig()).toThrow(ConfigError);
+  });
+
+  it("checkBlob passes with only the request header and passes it to the SDK", async () => {
+    storeOnly("production");
+    setRequestContext({ "x-vercel-oidc-token": requestToken });
+    healthyStore();
+
+    const result = await blob.checkBlob();
+
+    expect(result).toEqual({
+      ok: true,
+      latencyMs: expect.any(Number),
+      storeIdVariable: "BLOB_STORE_ID",
+      fingerprint: fingerprint(prodStoreId),
+    });
+    const calls = [
+      ...sdk.put.mock.calls.map((call) => call[2]),
+      ...sdk.get.mock.calls.map((call) => call[1]),
+      ...sdk.del.mock.calls.map((call) => call[1]),
+    ];
+    expect(calls.length).toBe(3);
+    for (const options of calls) {
+      expect(options).toMatchObject({
+        storeId: prodStoreId,
+        oidcToken: requestToken,
+      });
+    }
+    expectNoSecrets(result);
+  });
+
+  it("checkBlob reports a configuration error with no token anywhere", async () => {
+    storeOnly("production");
+    setRequestContext({});
+    healthyStore();
+
+    const result = await blob.checkBlob();
+
+    expect(result).toEqual({
+      ok: false,
+      latencyMs: expect.any(Number),
+      storeIdVariable: "BLOB_STORE_ID",
+      error: "configuration missing or invalid",
+    });
+    expect(sdk.put).not.toHaveBeenCalled();
+  });
+
+  it("checkBlob never returns the request token, even in SDK errors", async () => {
+    storeOnly("production");
+    setRequestContext({ "x-vercel-oidc-token": requestToken });
+    sdk.put.mockRejectedValue(new BlobAccessError());
+    sdk.del.mockRejectedValue(new Error(`Bearer ${requestToken}`));
+
+    const result = await blob.checkBlob();
+
+    expect(result.ok).toBe(false);
+    expectNoSecrets(result);
+  });
 });
 
 describe("blobConfig", () => {

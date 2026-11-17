@@ -77,9 +77,17 @@ curl -s -w '\nHTTP %{http_code}\n' \
 ```
 
 Expect HTTP 200 with `"environment": "development"` and
-`"storeIdVariable": "DEV_BLOB_STORE_ID"`. If the blob check fails with
-`"configuration missing or invalid"` or `"access denied"`, the OIDC token
-has probably expired; pull `.env.local` again.
+`"storeIdVariable": "DEV_BLOB_STORE_ID"`. Locally, the blob check uses
+`VERCEL_OIDC_TOKEN` from `.env.local`, which expires after a few hours. If
+the blob check fails with `"access denied"`, the token has probably
+expired; if it fails with `"configuration missing or invalid"`, the token
+or `DEV_BLOB_STORE_ID` is missing. Either way, pull `.env.local` again.
+
+In deployed functions the token is not an environment variable: Vercel
+sends it with each request in the `x-vercel-oidc-token` header (ADR 0005).
+A `"configuration missing or invalid"` blob error in a deployment means
+that the header was missing (check that OIDC is enabled for the project)
+or that the store ID variable is not set for that environment.
 
 ## Calling it in Production
 

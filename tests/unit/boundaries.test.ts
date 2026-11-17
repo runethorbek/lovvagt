@@ -1,8 +1,8 @@
 /**
  * Architecture boundaries: only the configuration module may read the
- * process environment, only the blob helper may name the blob variables,
- * and only the model adapter may import the Gemini SDK. See ADR 0003,
- * ADR 0004 and CLAUDE.md.
+ * process environment, only the blob helper may name the blob variables or
+ * import the Vercel OIDC package, and only the model adapter may import the Gemini
+ * SDK. See ADR 0003, ADR 0004, ADR 0005 and CLAUDE.md.
  */
 import {
   mkdirSync,
@@ -77,6 +77,11 @@ const geminiImport = new RegExp(
   `["'\`](${geminiPackages.join("|")})(/[^"'\`]*)?["'\`]`,
 );
 
+// Matches a module specifier for the Vercel OIDC package in any import form. Built at
+// runtime so that this file's own source does not match the scan.
+const oidcPackage = ["@vercel", "oidc"].join("/");
+const oidcImport = new RegExp(`["'\`]${oidcPackage}(/[^"'\`]*)?["'\`]`);
+
 function sourceFiles(root: string, directory = root): string[] {
   const files: string[] = [];
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
@@ -114,6 +119,15 @@ function findBlobViolations(root: string): string[] {
         .map(([name]) => name);
       return names.length > 0 ? [`${file}: ${names.join(", ")}`] : [];
     })
+    .sort();
+}
+
+/** Returns the repo-relative paths of files outside the blob helper that import the Vercel OIDC package. */
+function findOidcViolations(root: string): string[] {
+  const allowed = new Set(blobTestFiles);
+  return sourceFiles(root)
+    .filter((file) => !file.startsWith(blobModule) && !allowed.has(file))
+    .filter((file) => oidcImport.test(readFileSync(join(root, file), "utf8")))
     .sort();
 }
 
@@ -278,6 +292,56 @@ describe("Gemini SDK boundary", () => {
         "lib/b.ts",
         "lib/c.ts",
         "lib/d.cjs",
+        "tests/unit/other.test.ts",
+      ]);
+    });
+  });
+});
+
+describe("@vercel/oidc boundary", () => {
+  it("is imported only by the blob helper and its tests", () => {
+    expect(findOidcViolations(repoRoot)).toEqual([]);
+  });
+
+  it("is actually imported by the blob helper", () => {
+    const source = readFileSync(join(repoRoot, "lib/blob/config.ts"), "utf8");
+    expect(oidcImport.test(source)).toBe(true);
+  });
+
+  describe("on a fixture repository", () => {
+    let fixture: string;
+
+    afterEach(() => {
+      rmSync(fixture, { recursive: true, force: true });
+    });
+
+    function write(path: string, content: string) {
+      const full = join(fixture, path);
+      mkdirSync(join(full, ".."), { recursive: true });
+      writeFileSync(full, content);
+    }
+
+    it("fails on each form of import outside the blob helper", () => {
+      fixture = mkdtempSync(join(tmpdir(), "lovvagt-boundaries-"));
+      write(
+        "lib/blob/config.ts",
+        `import { getContext } from "${oidcPackage}";`,
+      );
+      write("tests/unit/blob.test.ts", `vi.mock("${oidcPackage}");`);
+      write("lib/a.ts", `import { getContext } from "${oidcPackage}";`);
+      write("app/b.tsx", `const m = await import('${oidcPackage}/dist/x');`);
+      write("lib/c.cjs", `require(\`${oidcPackage}\`);`);
+      write("tests/unit/other.test.ts", `vi.mock("${oidcPackage}");`);
+      write(
+        "lib/ok.ts",
+        `import { x } from "${oidcPackage}-extra"; // ${oidcPackage}`,
+      );
+      write("node_modules/dep/index.js", `require("${oidcPackage}");`);
+
+      expect(findOidcViolations(fixture)).toEqual([
+        "app/b.tsx",
+        "lib/a.ts",
+        "lib/c.cjs",
         "tests/unit/other.test.ts",
       ]);
     });
