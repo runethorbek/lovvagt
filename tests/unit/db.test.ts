@@ -118,6 +118,80 @@ describe("checkDatabase", () => {
     expectNoSecrets(result);
   });
 
+  /**
+   * Shaped like the driver's errors over HTTP (`@neondatabase/serverless`
+   * 1.2.1): an HTTP 400 copies the server's JSON fields onto a `NeonDbError`,
+   * and a wrong password arrives with an empty `code`.
+   */
+  function neonHttpError(message: string, code: string | undefined) {
+    const error = new Error(message) as Error & { code?: string };
+    error.name = "NeonDbError";
+    error.code = code;
+    return error;
+  }
+
+  it.each([
+    ["an empty code", ""],
+    ["no code", undefined],
+  ])(
+    "reports an authentication failure for a Neon HTTP error with %s",
+    async (_label, code) => {
+      query.mockRejectedValue(
+        neonHttpError(
+          `password authentication failed for user '${user}' (${url})`,
+          code,
+        ),
+      );
+
+      const result = await checkDatabase();
+
+      expect(result).toEqual({
+        ok: false,
+        latencyMs: expect.any(Number),
+        error: databaseErrors.authentication,
+      });
+      expectNoSecrets(result);
+    },
+  );
+
+  it.each(["28P01", "28000"])(
+    "reports an authentication failure for SQLSTATE %s",
+    async (code) => {
+      query.mockRejectedValue(leakyError(code));
+
+      const result = await checkDatabase();
+
+      expect(result).toMatchObject({
+        ok: false,
+        error: databaseErrors.authentication,
+      });
+      expectNoSecrets(result);
+    },
+  );
+
+  it("still reports a network error from the driver as a connection failure", async () => {
+    query.mockRejectedValue(
+      neonHttpError(
+        `Error connecting to database: TypeError: fetch failed (${url})`,
+        undefined,
+      ),
+    );
+
+    expect(await checkDatabase()).toMatchObject({
+      ok: false,
+      error: databaseErrors.connection,
+    });
+  });
+
+  it("does not treat an authentication phrase in a non-Error as authentication", async () => {
+    query.mockRejectedValue("password authentication failed");
+
+    expect(await checkDatabase()).toMatchObject({
+      ok: false,
+      error: databaseErrors.connection,
+    });
+  });
+
   it("reports a non-Error rejection containing secrets as a connection failure", async () => {
     query.mockRejectedValue(url);
 

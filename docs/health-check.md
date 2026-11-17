@@ -59,6 +59,17 @@ if any fails.
   `"rate limited"`, `"configuration missing or invalid"`, `"timeout"`.
   Failed blob checks still name `storeIdVariable`, and failed Gemini
   checks still name `model`.
+- Database errors (`databaseErrors` in `lib/db.ts`):
+  - `"configuration missing or invalid"`: `DATABASE_URL` or
+    `DATABASE_URL_UNPOOLED` is missing.
+  - `"invalid connection string"`: the URL has no host or database.
+  - `"connection failed"`: the database could not be reached (network,
+    DNS or timeout).
+  - `"authentication failed"`: Neon rejected the user or password. Check
+    that the connection string for that environment belongs to an existing
+    branch and role.
+  - `"query failed"`: any other Postgres error.
+  - `"unexpected result"`: `SELECT 1` returned something else.
 - No secret, connection string, token, store ID or API key is ever in the
   response, and the endpoint logs nothing.
 
