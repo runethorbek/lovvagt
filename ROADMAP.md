@@ -11,9 +11,7 @@ Update **Where we are** at the end of every work session.
 
 **Next action:**
 
-1. Fix the infrastructure items that phase 2 needs (see Open items):
-   give Preview its own database (Neon branch per preview, or a shared
-   preview branch), and consider moving functions from `iad1` to Frankfurt.
+1. Consider moving functions from `iad1` to Frankfurt (see Open items).
 2. Write spec 002 (ingest from ODA), then break it down into an epic with
    sub-issues for approval.
 
@@ -60,7 +58,7 @@ Status: ✅ done · 🟡 in progress · ⬜ not started
 
 - ✅ Public GitHub repo with ruleset on `main` (PR required, no force push, squash merge only)
 - ✅ Vercel project (Next.js; functions meant for Frankfurt but observed in `iad1`, see Open items)
-- ✅ Neon Postgres via Vercel (Production + Preview on `main`); `dev` branch for Development (created 2026-11-17, Development variables set by hand)
+- ✅ Neon Postgres via Vercel: `main` for Production (integration); `preview` branch for Preview and `dev` branch for Development (both created 2026-11-17, variables set by hand)
 - ✅ Blob stores: `lovvagt-docs` (Production), `lovvagt-docs-dev` (Development + Preview)
 - ✅ Gemini keys in separate Google projects (prod, dev)
 - ✅ Dev container with Claude Code, GitHub CLI and Vercel CLI
@@ -71,22 +69,20 @@ Status: ✅ done · 🟡 in progress · ⬜ not started
 Things that are known but not yet handled. Move them into a spec when
 they become relevant.
 
-| Item                                                                                                                                                           | Needed before              |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| Preview database isolation: Preview uses the production database (`main`, confirmed 2026-11-17); enable Neon branch per preview or give Preview its own branch | Any migration (phase 2)    |
-| Clean up Neon preview branches (free plan: 10 branches per project)                                                                                            | Phase 2                    |
-| Preview deployment protection bypass for automated browser tests                                                                                               | Phase 7                    |
-| Dev container: host Git credentials are forwarded, so the scoped GitHub token is not airtight                                                                  | Agent automation (phase 8) |
-| Dev container: network firewall (see Anthropic's reference dev container)                                                                                      | Agent automation (phase 8) |
-| Restrict Gemini keys to the Generative Language API in Google Cloud (verify)                                                                                   | Phase 4                    |
-| Watch Blob quota (1 GB, 2,000 uploads/month on Hobby); backfill must be spread out                                                                             | Phase 2                    |
-| `npm audit`: high findings via `@vercel/blob` → `@vercel/oidc` → `@vercel/cli-config` → `zod@4.1.11`; moderate via eslint `minimatch`                          | Any time (upstream fix)    |
-| Functions run in `iad1` (Washington), not Frankfurt where the database is; Production `SELECT 1` took ~1 s. Set the function region in Vercel                  | Phase 2                    |
-| Blob OIDC token outside a request (Workflow steps, cron): check how Vercel delivers it there (ADR 0005)                                                        | Phase 8                    |
-| `next dev` generates an untracked `AGENTS.md`; set `agentRules: false` in `next.config.ts` or commit/ignore it                                                 | Any time                   |
-| Gemini free-tier limits are not published per model; watch the AI Studio rate-limit dashboard (limits are per project)                                         | Phase 4                    |
-| Consider moving the repo into the WSL file system if the container feels slow                                                                                  | Any time                   |
-| Vercel Hobby is for non-commercial use; revisit if Lovvagt becomes a product                                                                                   | Before any commercial use  |
+| Item                                                                                                                                          | Needed before              |
+| --------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| Preview deployment protection bypass for automated browser tests                                                                              | Phase 7                    |
+| Dev container: host Git credentials are forwarded, so the scoped GitHub token is not airtight                                                 | Agent automation (phase 8) |
+| Dev container: network firewall (see Anthropic's reference dev container)                                                                     | Agent automation (phase 8) |
+| Restrict Gemini keys to the Generative Language API in Google Cloud (verify)                                                                  | Phase 4                    |
+| Watch Blob quota (1 GB, 2,000 uploads/month on Hobby); backfill must be spread out                                                            | Phase 2                    |
+| `npm audit`: high findings via `@vercel/blob` → `@vercel/oidc` → `@vercel/cli-config` → `zod@4.1.11`; moderate via eslint `minimatch`         | Any time (upstream fix)    |
+| Functions run in `iad1` (Washington), not Frankfurt where the database is; Production `SELECT 1` took ~1 s. Set the function region in Vercel | Phase 2                    |
+| Blob OIDC token outside a request (Workflow steps, cron): check how Vercel delivers it there (ADR 0005)                                       | Phase 8                    |
+| `next dev` generates an untracked `AGENTS.md`; set `agentRules: false` in `next.config.ts` or commit/ignore it                                | Any time                   |
+| Gemini free-tier limits are not published per model; watch the AI Studio rate-limit dashboard (limits are per project)                        | Phase 4                    |
+| Consider moving the repo into the WSL file system if the container feels slow                                                                 | Any time                   |
+| Vercel Hobby is for non-commercial use; revisit if Lovvagt becomes a product                                                                  | Before any commercial use  |
 
 ## Working agreements
 
@@ -107,7 +103,8 @@ Newest first. One or two lines per session.
   (phase 1 done). Found and fixed: Development had no working database (no
   `dev` branch; created), blob OIDC token at runtime (#21, ADR 0005) and
   misleading database auth error (#22). Gemini dropped from the
-  "fingerprints differ" criterion.
+  "fingerprints differ" criterion. Gave Preview its own Neon `preview`
+  branch (Preview removed from the Neon integration).
 - **2026-11-16** – Added session protocol. Agent implemented spec 001
   issues #5 (config), #6 (database), #7 (blob, OIDC), #8 (Gemini adapter,
   `gemini-3.5-flash-lite`), #14 (Neon driver upgrade) and #9 (protected
