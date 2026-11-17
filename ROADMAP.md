@@ -77,7 +77,6 @@ they become relevant.
 | Watch Blob quota (1 GB, 2,000 uploads/month on Hobby); backfill must be spread out                                                        | Phase 2                    |
 | `npm audit`: high findings via `@vercel/blob` → `@vercel/oidc` → `@vercel/cli-config` → `zod@4.1.11`; moderate via eslint `minimatch`     | Any time (upstream fix)    |
 | Blob OIDC token outside a request (Workflow steps, cron): check how Vercel delivers it there (ADR 0005)                                   | Phase 8                    |
-| `next dev` generates an untracked `AGENTS.md`; set `agentRules: false` in `next.config.ts` or commit/ignore it                            | Any time                   |
 | Gemini free-tier limits are not published per model; watch the AI Studio rate-limit dashboard (limits are per project)                    | Phase 4                    |
 | Gemini health check takes ~8 s against a 10 s timeout (`checkTimeoutMs`); raise it or give Gemini its own timeout if it starts timing out | Phase 4                    |
 | Consider moving the repo into the WSL file system if the container feels slow                                                             | Any time                   |
