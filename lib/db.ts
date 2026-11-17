@@ -22,6 +22,7 @@ export const databaseErrors = {
   configuration: "configuration missing or invalid",
   connectionString: "invalid connection string",
   connection: "connection failed",
+  authentication: "authentication failed",
   query: "query failed",
   unexpectedResult: "unexpected result",
 } as const;
@@ -44,6 +45,36 @@ export function fingerprintInput(connectionString: string): string {
   const database = decodeURIComponent(url.pathname.replace(/^\//, ""));
   if (!url.hostname || !database) throw new Error("incomplete");
   return `${url.hostname.toLowerCase()}/${database}`;
+}
+
+const sqlState = /^[0-9A-Z]{5}$/;
+
+// Matched against the driver message only to classify it; the message itself
+// is never returned, logged or attached.
+const authenticationMessage =
+  /password authentication failed|authentication failed|invalid password/i;
+
+/**
+ * Maps a driver error to a fixed message. Postgres errors carry a
+ * five-character SQLSTATE code; class `28` is an authorisation failure.
+ * Over HTTP, Neon reports a wrong password with an empty `code`, so an error
+ * without a valid code is an authentication failure if its message says so,
+ * and a connection failure (network errors, timeouts) otherwise.
+ */
+function classifyQueryError(error: unknown): DatabaseError {
+  const code =
+    error instanceof Error && "code" in error && typeof error.code === "string"
+      ? error.code
+      : "";
+  if (sqlState.test(code)) {
+    return code.startsWith("28")
+      ? databaseErrors.authentication
+      : databaseErrors.query;
+  }
+  const message = error instanceof Error ? error.message : "";
+  return authenticationMessage.test(message)
+    ? databaseErrors.authentication
+    : databaseErrors.connection;
 }
 
 /**
@@ -78,16 +109,7 @@ export async function checkDatabase(): Promise<DatabaseCheck> {
   try {
     rows = await sql`SELECT 1 AS ok`;
   } catch (error) {
-    // An error reported by Postgres carries a five-character SQLSTATE code;
-    // anything else (network errors, timeouts) is a connection failure.
-    const isQueryError =
-      error instanceof Error &&
-      "code" in error &&
-      typeof error.code === "string" &&
-      /^[0-9A-Z]{5}$/.test(error.code);
-    return fail(
-      isQueryError ? databaseErrors.query : databaseErrors.connection,
-    );
+    return fail(classifyQueryError(error));
   }
 
   if (rows.length !== 1 || rows[0]?.ok !== 1) {
