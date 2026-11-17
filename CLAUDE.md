@@ -76,11 +76,13 @@ Everything else (code, comments, docs, issues, commits) is in English.
   production credentials.
 - Blob uses Vercel OIDC, not read-write tokens (ADR 0004). The store ID
   differs by environment: `BLOB_STORE_ID` in Production, `DEV_BLOB_STORE_ID`
-  in Development/Preview; `VERCEL_OIDC_TOKEN` is the (secret, short-lived)
-  credential. Access Blob only through the helper in `lib/blob/`
+  in Development/Preview. The credential is a secret, short-lived OIDC
+  token: in deployed functions it comes per request from the
+  `x-vercel-oidc-token` header (via `@vercel/oidc`), locally from
+  `VERCEL_OIDC_TOKEN` (ADR 0005). Access Blob only through the helper in `lib/blob/`
   (`lib/blob/index.ts`), which selects the store ID from `VERCEL_ENV`
   (`lib/blob/config.ts`) and passes `storeId` and `oidcToken` explicitly on
-  every SDK call. No other code may import `@vercel/blob` or name
+  every SDK call. No other code may import `@vercel/blob` or `@vercel/oidc`, or name
   `BLOB_STORE_ID`, `DEV_BLOB_STORE_ID`, `VERCEL_OIDC_TOKEN`,
   `BLOB_READ_WRITE_TOKEN` or `DEV_BLOB_READ_WRITE_TOKEN` (enforced by
   `tests/unit/boundaries.test.ts`). Never pass SDK error messages on.

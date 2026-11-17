@@ -1,6 +1,6 @@
 # 0004. Blob authentication via Vercel OIDC
 
-**Status:** Accepted
+**Status:** Accepted; decision 2 amended by ADR 0005 (token at runtime)
 **Date:** 2026-11-16
 
 ## Context
