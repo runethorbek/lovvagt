@@ -11,7 +11,8 @@ Update **Where we are** at the end of every work session.
 
 **Next action:**
 
-1. Agent implements #34 (ODA client, `agent:ready`).
+1. Human runs `/build-slice 34` (ODA client, `agent:ready`): first issue
+   implemented through the orchestrated implementer/reviewer loop.
 2. Human sets `agent:ready` on #35 (topic rules) once #34 is merged; then
    #36 → #37 → #38 → #39 in order.
 
@@ -73,6 +74,7 @@ they become relevant.
 | Item                                                                                                                                      | Needed before              |
 | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
 | Migrate Preview and Production to `0001_initial` (`npm run db:migrate -- --environment=<name>`, human only)                               | Phase 2 deploy (#39)       |
+| Enable **Allow GitHub Actions to create and approve pull requests** (Settings → Actions → General), human only                            | Next skills sync           |
 | Preview deployment protection bypass for automated browser tests                                                                          | Phase 7                    |
 | Dev container: host Git credentials are forwarded, so the scoped GitHub token is not airtight                                             | Agent automation (phase 8) |
 | Dev container: network firewall (see Anthropic's reference dev container)                                                                 | Agent automation (phase 8) |
@@ -92,6 +94,9 @@ they become relevant.
   breakdown and sets `agent:ready`.
 - Agents are run manually, one issue at a time, until they reliably
   complete issues without help. Then automate.
+- Issues are implemented with `/build-slice <issue>`: an implementer
+  subagent builds, a fresh read-only reviewer subagent reviews each round
+  (skills synced from `runethorbek/skills`; see CLAUDE.md).
 - The human's checkpoints: writing specs, approving breakdowns,
   verifying acceptance criteria that need real environments.
 
@@ -99,6 +104,10 @@ they become relevant.
 
 Newest first. One or two lines per session.
 
+- **2026-11-19** – Added shared Claude Code skills from
+  `runethorbek/skills` via a sync workflow (#43, #44): `/build-slice` with
+  `slice-implementer`/`slice-reviewer` subagents, `/agent-ready`,
+  `/draft-issue`; CLAUDE.md says how they fit Lovvagt's rules.
 - **2026-11-19** – Wrote spec 002 (#31, #40) and broke it into epic #32
   with sub-issues #33–#39. Agent implemented #33 (#41): migration runner,
   `0001_initial` schema, PGlite SQL harness, ADR 0006; development database
