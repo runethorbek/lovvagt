@@ -1,6 +1,6 @@
 # Spec 002 – Ingest bills from ODA
 
-**Status:** Draft
+**Status:** Ready for implementation (epic #32)
 **Owner:** Rune (human)
 **Implementer:** Claude Code (agent), via epic and sub-issues
 
