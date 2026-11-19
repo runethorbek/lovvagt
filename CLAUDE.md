@@ -39,6 +39,7 @@ Architecture decisions are in `docs/decisions/`. Specs are in `specs/`.
 | `npm test`             | Vitest unit tests (`tests/unit/`)                                                |
 | `npm run build`        | Next.js production build                                                         |
 | `npm run test:e2e`     | Playwright tests (`tests/e2e/`) against the built app; run `npm run build` first |
+| `npm run db:migrate`   | Apply pending SQL migrations in `db/migrations/` (development database only)     |
 
 Run the same sequence as CI before opening a pull request:
 `npm run lint && npm run format:check && npm run typecheck && npm test && npm run build && npm run test:e2e`.
@@ -87,9 +88,16 @@ Everything else (code, comments, docs, issues, commits) is in English.
   `BLOB_READ_WRITE_TOKEN` or `DEV_BLOB_READ_WRITE_TOKEN` (enforced by
   `tests/unit/boundaries.test.ts`). Never pass SDK error messages on.
 - Access the database only through `lib/db.ts` (`db()` for queries,
-  `checkDatabase()` for the health probe). No other code may import
+  `executor()` for code that takes a `SqlExecutor` so it can be tested on
+  PGlite, `checkDatabase()` for the health probe). No other code may import
   `@neondatabase/serverless` or call `config.database()`. Never pass driver
   error messages on: they can contain the connection string.
+- Schema changes are plain SQL migrations in `db/migrations/`
+  (`NNNN_short_name.sql`), applied by `npm run db:migrate` (ADR 0006). Never
+  edit an applied migration; add a new one. Agents only migrate the
+  development database: never pass `--environment=preview` or
+  `--environment=production`; the human migrates those. Test SQL against
+  PGlite with `tests/support/pglite.ts`, never against Neon.
 - Call Gemini only through the model adapter `lib/model.ts` (`generateText()`
   with a task name, `checkGemini()` for the health probe), so models can be
   swapped per task. Model IDs live only in its `models` object, keyed by task;

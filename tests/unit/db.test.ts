@@ -1,14 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // The driver is mocked: no test in this file may reach Neon.
-const query = vi.fn();
+const query = Object.assign(vi.fn(), {
+  query: vi.fn(),
+  transaction: vi.fn(),
+});
 const neon = vi.fn((connectionString: string) => {
   void connectionString;
   return query;
 });
 vi.mock("@neondatabase/serverless", () => ({ neon }));
 
-const { checkDatabase, databaseErrors, db, fingerprintInput } =
+const { checkDatabase, databaseErrors, db, executor, fingerprintInput } =
   await import("@/lib/db");
 const { fingerprint } = await import("@/lib/fingerprint");
 
@@ -47,6 +50,8 @@ beforeEach(() => {
     }),
   );
   query.mockReset();
+  query.query.mockReset();
+  query.transaction.mockReset();
   neon.mockClear();
 });
 
@@ -59,6 +64,45 @@ describe("db", () => {
   it("creates the client with the pooled DATABASE_URL", () => {
     expect(db()).toBe(query);
     expect(neon).toHaveBeenCalledWith(url);
+  });
+});
+
+describe("executor", () => {
+  it("runs a query with its parameters on the pooled DATABASE_URL", async () => {
+    query.query.mockResolvedValue([{ a: 1 }]);
+
+    const rows = await executor().query("SELECT $1::int AS a", [1]);
+
+    expect(rows).toEqual([{ a: 1 }]);
+    expect(neon).toHaveBeenCalledWith(url);
+    expect(query.query).toHaveBeenCalledWith("SELECT $1::int AS a", [1]);
+  });
+
+  it("defaults to no parameters", async () => {
+    query.query.mockResolvedValue([]);
+
+    await executor().query("SELECT 1");
+
+    expect(query.query).toHaveBeenCalledWith("SELECT 1", []);
+  });
+
+  it("sends all statements as one Neon transaction, in order", async () => {
+    query.query.mockImplementation((text: string, params: unknown[]) => ({
+      text,
+      params,
+    }));
+    query.transaction.mockResolvedValue([]);
+
+    await executor().transaction([
+      { text: "CREATE TABLE a (id int)" },
+      { text: "INSERT INTO a VALUES ($1)", params: [1] },
+    ]);
+
+    expect(query.transaction).toHaveBeenCalledTimes(1);
+    expect(query.transaction).toHaveBeenCalledWith([
+      { text: "CREATE TABLE a (id int)", params: [] },
+      { text: "INSERT INTO a VALUES ($1)", params: [1] },
+    ]);
   });
 });
 
