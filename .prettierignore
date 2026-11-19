@@ -9,3 +9,8 @@ playwright-report
 test-results
 .vercel
 .devcontainer
+
+# Synchronized verbatim from runethorbek/skills by
+# .github/workflows/sync-claude-skills.yml; formatting is owned by the source.
+.claude/skills
+.claude/agents
