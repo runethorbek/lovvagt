@@ -29,6 +29,15 @@ export function jsonResponse(body: string, status = 200): Response {
   });
 }
 
+/**
+ * Sets the final URL of a mocked response, as `fetch` does after following
+ * redirects. Responses built in tests otherwise have an empty `url`.
+ */
+export function redirectedTo(response: Response, url: string): Response {
+  Object.defineProperty(response, "url", { value: url });
+  return response;
+}
+
 /** An empty response with the given status. */
 export function statusResponse(status: number): Response {
   return new Response(null, { status });

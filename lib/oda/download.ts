@@ -18,21 +18,22 @@ export const defaultMaxFileBytes = 25 * 1024 * 1024;
 /** Default timeout per download attempt; files are larger than query pages. */
 export const defaultDownloadTimeoutMs = 120_000;
 
-/** Files are only fetched over HTTPS from ft.dk or its subdomains. */
-function checkFileUrl(url: string): void {
+/**
+ * Files are only fetched over HTTPS from ft.dk or its subdomains. The same
+ * rule applies to the final URL after redirects.
+ */
+function isFileUrl(url: string): boolean {
   let parsed: URL;
   try {
     parsed = new URL(url);
   } catch {
-    throw new OdaError(odaFailureReasons.invalidUrl);
+    return false;
   }
   const host = parsed.hostname.toLowerCase();
-  if (
-    parsed.protocol !== "https:" ||
-    !(host === "ft.dk" || host.endsWith(".ft.dk"))
-  ) {
-    throw new OdaError(odaFailureReasons.invalidUrl);
-  }
+  return (
+    parsed.protocol === "https:" &&
+    (host === "ft.dk" || host.endsWith(".ft.dk"))
+  );
 }
 
 /**
@@ -84,7 +85,7 @@ export async function downloadFile(
 ): Promise<Uint8Array> {
   if (!Number.isInteger(maxBytes) || maxBytes < 0)
     throw new OdaError(odaFailureReasons.invalidQuery);
-  checkFileUrl(url);
+  if (!isFileUrl(url)) throw new OdaError(odaFailureReasons.invalidUrl);
   return odaRequest(
     url,
     (response) => readLimited(response, maxBytes),
@@ -93,5 +94,6 @@ export async function downloadFile(
       ...options,
     },
     "*/*",
+    isFileUrl,
   );
 }

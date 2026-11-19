@@ -7,7 +7,7 @@ import {
   OdaFileTooLargeError,
   odaUserAgent,
 } from "@/lib/oda";
-import { mockFetch, statusResponse } from "@/tests/support/oda";
+import { mockFetch, redirectedTo, statusResponse } from "@/tests/support/oda";
 
 // A real Fil.filurl from the L 211 fixture: a DOCX served from a .pdf URL.
 const fileUrl =
@@ -114,6 +114,32 @@ describe("downloadFile", () => {
     expect(bytes.byteLength).toBe(3);
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
+
+  it("accepts a redirect to another ft.dk host", async () => {
+    const { response } = streamingResponse(1, 3);
+    fetchMock.mockResolvedValueOnce(
+      redirectedTo(response, "https://files.ft.dk/3008206.pdf"),
+    );
+
+    expect((await downloadFile(fileUrl)).byteLength).toBe(3);
+  });
+
+  it.each(["https://example.com/3008206.pdf", "http://www.ft.dk/3008206.pdf"])(
+    "rejects a redirect to %s, cancels the body and does not retry",
+    async (url) => {
+      const { response, state } = streamingResponse(10, 1_000);
+      fetchMock.mockResolvedValue(redirectedTo(response, url));
+
+      const error = await downloadFile(fileUrl, undefined, {
+        retryDelayMs: 1,
+      }).catch((e: unknown) => e);
+
+      expect(error).toBeInstanceOf(OdaError);
+      expect((error as OdaError).reason).toBe(odaFailureReasons.invalidUrl);
+      expect(state.cancelled).toBe(true);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    },
+  );
 
   it.each([
     "http://www.ft.dk/file.pdf",

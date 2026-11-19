@@ -16,6 +16,7 @@ import {
   mockFetch,
   odaFixture,
   odaFixtureText,
+  redirectedTo,
   requestedUrls,
   statusResponse,
 } from "@/tests/support/oda";
@@ -119,6 +120,31 @@ describe("requests", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(a[0].id).toBe(101687);
     expect(b[0].id).toBe(101039);
+  });
+});
+
+describe("redirects", () => {
+  it("accepts a final URL on the ODA API", async () => {
+    fetchMock.mockResolvedValueOnce(
+      redirectedTo(
+        jsonResponse(odaFixtureText("sag-101687")),
+        `${odaBaseUrl}/Sag?$format=json`,
+      ),
+    );
+
+    expect(await fetchSag()).toHaveLength(1);
+  });
+
+  it.each([
+    ["another host", "https://example.com/api/Sag?$format=json"],
+    ["plain HTTP", `${odaBaseUrl.replace("https:", "http:")}/Sag`],
+  ])("rejects a redirect to %s without retrying", async (_, url) => {
+    fetchMock.mockResolvedValue(
+      redirectedTo(jsonResponse(odaFixtureText("sag-101687")), url),
+    );
+
+    await expectOdaError(fetchSag({}, fast), odaFailureReasons.invalidUrl);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
 

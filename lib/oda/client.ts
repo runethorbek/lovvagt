@@ -136,17 +136,39 @@ function statusError(status: number): OdaError {
   return new OdaError(odaFailureReasons.httpError, status);
 }
 
+/** True if `url` is an HTTPS URL on the ODA origin under `/api/`. */
+function isOdaApiUrl(url: string): boolean {
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return false;
+  }
+  const base = new URL(odaBaseUrl);
+  return (
+    parsed.origin === base.origin &&
+    parsed.pathname.startsWith(`${base.pathname}/`)
+  );
+}
+
 /**
  * GETs `url` and passes the successful response to `read`, which must
  * consume the body. Runs under the lock, with a timeout per attempt and
  * retries as described above. `read` may throw an `OdaError`, which is not
  * retried; other errors thrown while reading count as network errors.
+ *
+ * Redirects are followed, but the final URL must pass `isAllowedUrl` (by
+ * default: the ODA API), so a redirect cannot lead to another host. A
+ * mismatch fails with `invalidUrl` and is not retried. An empty
+ * `response.url` (a response not fetched over the network, as in tests)
+ * counts as no redirect.
  */
 export async function odaRequest<T>(
   url: string,
   read: (response: Response) => Promise<T>,
   options: OdaRequestOptions = {},
   accept = "application/json",
+  isAllowedUrl: (url: string) => boolean = isOdaApiUrl,
 ): Promise<T> {
   const {
     signal,
@@ -174,6 +196,10 @@ export async function odaRequest<T>(
           redirect: "follow",
           signal: attemptSignal,
         });
+        if (response.url !== "" && !isAllowedUrl(response.url)) {
+          await discard(response);
+          throw new OdaError(odaFailureReasons.invalidUrl);
+        }
         if (!response.ok) {
           await discard(response);
           throw statusError(response.status);
@@ -251,19 +277,8 @@ export function odaQueryUrl(entity: string, query: OdaQuery = {}): string {
  * JSON. Returns the URL to request next.
  */
 function nextPageUrl(link: string): string {
-  let parsed: URL;
-  try {
-    parsed = new URL(link);
-  } catch {
-    throw new OdaError(odaFailureReasons.invalidResponse);
-  }
-  const base = new URL(odaBaseUrl);
-  if (
-    parsed.origin !== base.origin ||
-    !parsed.pathname.startsWith(`${base.pathname}/`)
-  ) {
-    throw new OdaError(odaFailureReasons.invalidResponse);
-  }
+  if (!isOdaApiUrl(link)) throw new OdaError(odaFailureReasons.invalidResponse);
+  const parsed = new URL(link);
   if (/[?&]\$format=json(&|$)/.test(parsed.search)) return link;
   return `${link}${parsed.search ? "&" : "?"}$format=json`;
 }
