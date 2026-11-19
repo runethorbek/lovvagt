@@ -5,16 +5,15 @@ Update **Where we are** at the end of every work session.
 
 ## Where we are
 
-**Last updated:** 2026-11-17
+**Last updated:** 2026-11-19
 
 **Current phase:** 2 – Ingest (spec 002, not written yet)
 
 **Next action:**
 
-1. Review and merge #28 (commit the generated `AGENTS.md`; it also removes
-   the `AGENTS.md` open item).
-2. Write spec 002 (ingest from ODA), then break it down into an epic with
-   sub-issues for approval.
+1. Write spec 002 (ingest from ODA). Include the Blob quota open item
+   (backfill must be spread out).
+2. Break spec 002 down into an epic with sub-issues for approval.
 
 **Blocked on:** spec 002 (human).
 
@@ -99,6 +98,8 @@ they become relevant.
 
 Newest first. One or two lines per session.
 
+- **2026-11-19** – Status check: #28 and #29 merged, no open epic or
+  issues. Updated next action to spec 002.
 - **2026-11-17** – Verified spec 001 in both environments and closed epic #4
   (phase 1 done). Found and fixed: Development had no working database (no
   `dev` branch; created), blob OIDC token at runtime (#21, ADR 0005) and
