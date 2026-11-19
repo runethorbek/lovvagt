@@ -122,6 +122,30 @@ Everything else (code, comments, docs, issues, commits) is in English.
   in a comment, and stop.
 - Record architecture decisions in `docs/decisions/` (see ADR 0001).
 
+## Implementing with /build-slice
+
+Issues are implemented with `/build-slice <issue>` (synced from
+`runethorbek/skills`, see README "Claude Code skills"). The main session
+orchestrates; the `slice-implementer` subagent writes code and tests; a
+fresh, read-only `slice-reviewer` subagent reviews every round. If asked in
+plain words to implement an issue, suggest `/build-slice <issue>` instead of
+implementing directly. Prepare issues with `/draft-issue` and `/agent-ready`.
+
+Where the skill and this file differ, this file wins:
+
+- Only `agent:ready` issues. The orchestrator sets `agent:in-progress` (and
+  removes `agent:ready`) when it starts, and owns all tracker and git writes.
+- Baseline and verification use the full CI sequence from **Commands**,
+  including `npm run build` and `npm run test:e2e`.
+- Subagents never run `npm run db:migrate`, call Neon, Blob, Gemini or ODA,
+  or read `.env*` files. SQL is tested on PGlite.
+- The PR body follows `.github/pull_request_template.md`; put the skill's
+  extra sections (review rounds, not verified, assumptions) under
+  **Reviewer notes**. Pushing and opening the PR need no extra approval.
+- On any stop condition, label the issue `needs-human` and explain in a
+  comment, as well as reporting to the human.
+- When done, comment on the issue as required under **Workflow rules**.
+
 ## Sessions
 
 - At the start of a session, read ROADMAP.md before doing anything else.
