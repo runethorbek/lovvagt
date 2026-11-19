@@ -99,7 +99,8 @@ authentication. Facts checked against the live API on 2026-11-19:
 
 ## Prerequisites (human, before implementation starts)
 
-- [ ] Review and approve the seed topic rules in deliverable 3.
+- [x] Review and approve the seed topic rules in deliverable 3. (Approved
+      as-is on 2026-11-19, to be tuned after the dry run in #35.)
 - [ ] Check current Blob usage for both stores in the Vercel dashboard,
       so the monthly cap in deliverable 6 starts from a known number.
 
