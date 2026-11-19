@@ -7,15 +7,16 @@ Update **Where we are** at the end of every work session.
 
 **Last updated:** 2026-11-19
 
-**Current phase:** 2 – Ingest (spec 002, not written yet)
+**Current phase:** 2 – Ingest (spec 002, epic #32)
 
 **Next action:**
 
-1. Write spec 002 (ingest from ODA). Include the Blob quota open item
-   (backfill must be spread out).
-2. Break spec 002 down into an epic with sub-issues for approval.
+1. Agent implements #34 (ODA client, `agent:ready`).
+2. Human sets `agent:ready` on #35 (topic rules) once #34 is merged; then
+   #36 → #37 → #38 → #39 in order.
 
-**Blocked on:** spec 002 (human).
+**Blocked on:** #38 needs the human to check Blob usage for both stores in
+the Vercel dashboard (spec 002 prerequisite).
 
 ## How to resume after a break
 
@@ -46,7 +47,7 @@ Status: ✅ done · 🟡 in progress · ⬜ not started
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ------ |
 | 0   | Foundation: infrastructure, dev container, CI, CLAUDE.md, templates                                                                               | 000  | ✅     |
 | 1   | Connectivity: config, database, blob, Gemini access layers + health check                                                                         | 001  | ✅     |
-| 2   | Ingest: fetch cases, stages, votes and documents for tracked topics from ODA; store originals in Blob                                             | 002  | ⬜     |
+| 2   | Ingest: fetch cases, stages, votes and documents for tracked topics from ODA; store originals in Blob                                             | 002  | 🟡     |
 | 3   | Transform: extract text (prefer DOCX over PDF), split into sections, track document versions                                                      | 003  | ⬜     |
 | 4   | Enrich: topic classification, summaries with source references, extract consequences from the bill's general remarks                              | 004  | ⬜     |
 | 5   | Review: three independent reviewers (faithfulness, completeness, neutrality), deterministic decision rule, judge on disagreement, golden test set | 005  | ⬜     |
@@ -71,11 +72,11 @@ they become relevant.
 
 | Item                                                                                                                                      | Needed before              |
 | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| Migrate Preview and Production to `0001_initial` (`npm run db:migrate -- --environment=<name>`, human only)                               | Phase 2 deploy (#39)       |
 | Preview deployment protection bypass for automated browser tests                                                                          | Phase 7                    |
 | Dev container: host Git credentials are forwarded, so the scoped GitHub token is not airtight                                             | Agent automation (phase 8) |
 | Dev container: network firewall (see Anthropic's reference dev container)                                                                 | Agent automation (phase 8) |
 | Restrict Gemini keys to the Generative Language API in Google Cloud (verify)                                                              | Phase 4                    |
-| Watch Blob quota (1 GB, 2,000 uploads/month on Hobby); backfill must be spread out                                                        | Phase 2                    |
 | `npm audit`: high findings via `@vercel/blob` → `@vercel/oidc` → `@vercel/cli-config` → `zod@4.1.11`; moderate via eslint `minimatch`     | Any time (upstream fix)    |
 | Blob OIDC token outside a request (Workflow steps, cron): check how Vercel delivers it there (ADR 0005)                                   | Phase 8                    |
 | Gemini free-tier limits are not published per model; watch the AI Studio rate-limit dashboard (limits are per project)                    | Phase 4                    |
@@ -98,6 +99,11 @@ they become relevant.
 
 Newest first. One or two lines per session.
 
+- **2026-11-19** – Wrote spec 002 (#31, #40) and broke it into epic #32
+  with sub-issues #33–#39. Agent implemented #33 (#41): migration runner,
+  `0001_initial` schema, PGlite SQL harness, ADR 0006; development database
+  migrated. Schema choices confirmed (no FKs between ODA tables, DB-enforced
+  ingest lease); skipped-file storage moved to #38.
 - **2026-11-19** – Status check: #28 and #29 merged, no open epic or
   issues. Updated next action to spec 002.
 - **2026-11-17** – Verified spec 001 in both environments and closed epic #4
