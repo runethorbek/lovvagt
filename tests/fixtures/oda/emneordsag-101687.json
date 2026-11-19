@@ -1,0 +1,29 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#EmneordSag",
+  "value": [
+    {
+      "Emneord": {
+        "id": 33432,
+        "typeid": 4,
+        "emneord": "Forsvarsvæsen A 51",
+        "opdateringsdato": "2026-11-19T08:57:23.893"
+      },
+      "id": 891608,
+      "emneordid": 33432,
+      "sagid": 101687,
+      "opdateringsdato": "2025-07-25T12:35:04.057"
+    },
+    {
+      "Emneord": {
+        "id": 33142,
+        "typeid": 1,
+        "emneord": "forsvaret",
+        "opdateringsdato": "2026-11-19T17:15:07.763"
+      },
+      "id": 891609,
+      "emneordid": 33142,
+      "sagid": 101687,
+      "opdateringsdato": "2025-07-25T12:35:04.057"
+    }
+  ]
+}

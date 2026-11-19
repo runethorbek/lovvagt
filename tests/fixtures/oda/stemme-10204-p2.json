@@ -1,0 +1,19 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#Stemme",
+  "value": [
+    {
+      "id": 2289692,
+      "typeid": 3,
+      "afstemningid": 10204,
+      "aktørid": 20366,
+      "opdateringsdato": "2025-05-08T10:01:20.383"
+    },
+    {
+      "id": 2289693,
+      "typeid": 1,
+      "afstemningid": 10204,
+      "aktørid": 20364,
+      "opdateringsdato": "2025-05-08T10:01:20.383"
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#SagDokument",
+  "value": [
+    {
+      "Dokument": {
+        "Fil": [
+          {
+            "id": 2166509,
+            "dokumentid": 1160076,
+            "titel": "AG1139",
+            "versionsdato": "2025-04-23T13:13:08",
+            "filurl": "https://www.ft.dk/ripdf/samling/20241/lovforslag/l211/20241_l211_som_fremsat.pdf",
+            "opdateringsdato": "2025-04-23T13:13:28.413",
+            "variantkode": "P",
+            "format": "PDF"
+          }
+        ],
+        "id": 1160076,
+        "typeid": 21,
+        "kategoriid": 31,
+        "statusid": 1,
+        "offentlighedskode": "O",
+        "titel": "Fremsat den 23. april 2025 af forsvarsministeren (Troels Lund Poulsen)",
+        "dato": "2025-04-23T13:13:10.177",
+        "modtagelsesdato": "2025-04-23T13:12:55",
+        "frigivelsesdato": "2025-04-23T13:12:55",
+        "paragraf": "",
+        "paragrafnummer": "",
+        "spørgsmålsordlyd": null,
+        "spørgsmålstitel": null,
+        "spørgsmålsid": null,
+        "procedurenummer": "",
+        "grundnotatstatus": "",
+        "dagsordenudgavenummer": null,
+        "opdateringsdato": "2025-04-23T13:13:10.177"
+      },
+      "id": 1472879,
+      "sagid": 101687,
+      "dokumentid": 1160076,
+      "bilagsnummer": "",
+      "frigivelsesdato": "2025-04-23T00:00:00",
+      "opdateringsdato": "2025-04-23T13:13:10.177",
+      "rolleid": 3
+    },
+    {
+      "Dokument": {
+        "Fil": [
+          {
+            "id": 2166417,
+            "dokumentid": 1160040,
+            "titel": "Oversendelsesbrev til FOU - Lovforslag om ændring af lov om forsvarets formål, opgaver og organisation m.v. (Bekæmpelse af ulovlig droneaktivitet ved militære områder m.v.).DOCX",
+            "versionsdato": "2025-04-23T12:31:35",
+            "filurl": "https://www.ft.dk/samling/20241/lovforslag/l211/bilag/1/3008206.pdf",
+            "opdateringsdato": "2025-04-23T16:01:07.323",
+            "variantkode": "P",
+            "format": "DOCX"
+          },
+          {
+            "id": 2166419,
+            "dokumentid": 1160040,
+            "titel": "Høringsnotat - Lovforslag om ændring af lov om forsvarets formål, opgaver og organisation m.v. (Bekæmpelse af ulovlig droneaktivitet ved militære områder m.v.).DOCX",
+            "versionsdato": "2025-04-23T12:31:35",
+            "filurl": "https://www.ft.dk/samling/20241/lovforslag/l211/bilag/1/3008207.pdf",
+            "opdateringsdato": "2025-04-23T16:01:07.793",
+            "variantkode": "P",
+            "format": "DOCX"
+          },
+          {
+            "id": 2166421,
+            "dokumentid": 1160040,
+            "titel": "Høringssvar - Lovforslag om ændring af lov om forsvarets formål, opgaver og organisation m.v. (Bekæmpelse af ulovlig droneaktivitet ved militære områder m.v.).PDF",
+            "versionsdato": "2025-04-23T12:31:35",
+            "filurl": "https://www.ft.dk/samling/20241/lovforslag/l211/bilag/1/3008208.pdf",
+            "opdateringsdato": "2025-04-23T16:01:08.143",
+            "variantkode": "P",
+            "format": "PDF"
+          }
+        ],
+        "id": 1160040,
+        "typeid": 12,
+        "kategoriid": 15,
+        "statusid": 1,
+        "offentlighedskode": "O",
+        "titel": "Høringssvar og høringsnotat fra forsvarsministeren",
+        "dato": "2025-04-23T00:00:00",
+        "modtagelsesdato": "2025-04-23T00:00:00",
+        "frigivelsesdato": "2025-04-23T12:32:24",
+        "paragraf": "",
+        "paragrafnummer": "",
+        "spørgsmålsordlyd": null,
+        "spørgsmålstitel": null,
+        "spørgsmålsid": null,
+        "procedurenummer": "",
+        "grundnotatstatus": "",
+        "dagsordenudgavenummer": null,
+        "opdateringsdato": "2025-04-23T13:50:37.9"
+      },
+      "id": 1472918,
+      "sagid": 101687,
+      "dokumentid": 1160040,
+      "bilagsnummer": "Bilag 1",
+      "frigivelsesdato": "2025-04-23T00:00:00",
+      "opdateringsdato": "2025-04-23T13:50:37.9",
+      "rolleid": 4
+    },
+    {
+      "Dokument": {
+        "Fil": [
+          {
+            "id": 2195829,
+            "dokumentid": 1172180,
+            "titel": "AX31623",
+            "versionsdato": "2025-06-11T13:57:58",
+            "filurl": "https://www.ft.dk/ripdf/samling/20241/lovforslag/l211/20241_l211_som_vedtaget.pdf",
+            "opdateringsdato": "2025-06-11T13:58:34.857",
+            "variantkode": "P",
+            "format": "PDF"
+          }
+        ],
+        "id": 1172180,
+        "typeid": 21,
+        "kategoriid": 23,
+        "statusid": 1,
+        "offentlighedskode": "O",
+        "titel": "Vedtaget af Folketinget ved 3. behandling den 11. juni 2025",
+        "dato": "2025-06-11T13:58:30.967",
+        "modtagelsesdato": "2025-06-11T13:57:54",
+        "frigivelsesdato": "2025-06-11T13:57:54",
+        "paragraf": "",
+        "paragrafnummer": "",
+        "spørgsmålsordlyd": null,
+        "spørgsmålstitel": null,
+        "spørgsmålsid": null,
+        "procedurenummer": "",
+        "grundnotatstatus": "",
+        "dagsordenudgavenummer": null,
+        "opdateringsdato": "2025-06-11T13:58:30.967"
+      },
+      "id": 1484550,
+      "sagid": 101687,
+      "dokumentid": 1172180,
+      "bilagsnummer": "",
+      "frigivelsesdato": "2025-06-11T00:00:00",
+      "opdateringsdato": "2025-06-11T13:58:30.967",
+      "rolleid": 3
+    }
+  ]
+}

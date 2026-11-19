@@ -1,0 +1,36 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#Sag",
+  "value": [
+    {
+      "id": 101039,
+      "typeid": 3,
+      "kategoriid": 13,
+      "statusid": 11,
+      "titel": "Forslag til lov om supplerende bestemmelser til forordningen om kunstig intelligens.",
+      "titelkort": "Om supplerende bestemmelser til forordningen om kunstig intelligens.",
+      "offentlighedskode": "O",
+      "nummer": "L 154",
+      "nummerprefix": "L",
+      "nummernumerisk": "154",
+      "nummerpostfix": "",
+      "resume": "Lovforslaget implementerer en del af forordningen om kunstig intelligens. Forordningen er direkte gældende i Danmark og regulerer anvendelsen af kunstig intelligens ved at inddele brugen af kunstig intelligens i risikoområder. Hvis anvendelsen af kunstig intelligens udgør en betydelig risiko for grundlæggende rettigheder, sikkerhed og sundhed, er anvendelsen forbudt i EU. \n\nSom led i implementeringen skal der udpeges myndigheder i national lovgivning, der har ansvaret for tilsynet med de forbudte former for AI-systemer i Danmark. Lovforslaget udpeger således Digitaliseringsstyrelsen, Datatilsynet og Domstolsstyrelsen som markedsovervågningsmyndigheder med de nødvendige tilsynskompetencer. Digitaliseringsstyrelsen udpeges som bemyndigende myndighed og som centralt kontaktpunkt.\n\nForordningen træder i kraft i etaper. Den del af forordningen, der regulerer tilsynet med anvendelse af kunstig intelligens på de områder, der i forordningen er højrisikoområder, træder i kraft til august 2025. Der ventes yderligere lovgivning, i takt med at andre dele af forordningen om kunstig intelligens træder i kraft.",
+      "afstemningskonklusion": "Vedtaget\nFor stemte 109 (S, V, DD, SF, LA, M, KF, EL, DF, RV, ALT, BP, Jon Stephensen (UFG), Mike Villa Fonseca (UFG), Jeppe Søe (UFG)) \nimod stemte 0 \nhverken for eller imod stemte 0 ",
+      "periodeid": 163,
+      "afgørelsesresultatkode": null,
+      "baggrundsmateriale": null,
+      "opdateringsdato": "2025-05-15T09:07:48.77",
+      "statsbudgetsag": false,
+      "begrundelse": null,
+      "paragrafnummer": null,
+      "paragraf": null,
+      "afgørelsesdato": null,
+      "afgørelse": null,
+      "rådsmødedato": null,
+      "lovnummer": "467",
+      "lovnummerdato": "2025-05-14T00:00:00",
+      "retsinformationsurl": null,
+      "fremsatundersagid": null,
+      "deltundersagid": null
+    }
+  ]
+}

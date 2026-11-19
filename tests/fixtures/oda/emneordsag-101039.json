@@ -1,0 +1,29 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#EmneordSag",
+  "value": [
+    {
+      "Emneord": {
+        "id": 35213,
+        "typeid": 4,
+        "emneord": "Biblioteker og museer 14",
+        "opdateringsdato": "2026-11-19T11:44:00.65"
+      },
+      "id": 881597,
+      "emneordid": 35213,
+      "sagid": 101039,
+      "opdateringsdato": "2025-05-15T09:07:48.77"
+    },
+    {
+      "Emneord": {
+        "id": 85381,
+        "typeid": 1,
+        "emneord": "digital service og digital transformation",
+        "opdateringsdato": "2026-03-04T13:08:39.747"
+      },
+      "id": 881598,
+      "emneordid": 85381,
+      "sagid": 101039,
+      "opdateringsdato": "2025-05-15T09:07:48.77"
+    }
+  ]
+}

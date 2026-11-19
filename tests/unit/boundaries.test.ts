@@ -1,8 +1,9 @@
 /**
  * Architecture boundaries: only the configuration module may read the
  * process environment, only the blob helper may name the blob variables or
- * import the Vercel OIDC package, and only the model adapter may import the Gemini
- * SDK. See ADR 0003, ADR 0004, ADR 0005 and CLAUDE.md.
+ * import the Vercel OIDC package, only the model adapter may import the Gemini
+ * SDK, and only the ODA client may name the ODA host. See ADR 0003, ADR 0004,
+ * ADR 0005, CLAUDE.md and spec 002.
  */
 import {
   mkdirSync,
@@ -82,6 +83,14 @@ const geminiImport = new RegExp(
 const oidcPackage = ["@vercel", "oidc"].join("/");
 const oidcImport = new RegExp(`["'\`]${oidcPackage}(/[^"'\`]*)?["'\`]`);
 
+/** The only place allowed to name the ODA host. */
+const odaModule = "lib/oda/";
+
+// The ODA host, built at runtime so that this file's own source does not match
+// the scan. Matched case-insensitively, since host names are.
+const odaHost = ["oda", "ft", "dk"].join(".");
+const odaHostPattern = new RegExp(odaHost.replaceAll(".", "\\."), "i");
+
 function sourceFiles(root: string, directory = root): string[] {
   const files: string[] = [];
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
@@ -137,6 +146,16 @@ function findGeminiViolations(root: string): string[] {
   return sourceFiles(root)
     .filter((file) => !allowed.has(file))
     .filter((file) => geminiImport.test(readFileSync(join(root, file), "utf8")))
+    .sort();
+}
+
+/** Returns the repo-relative paths of files outside the ODA client that name the ODA host. */
+function findOdaViolations(root: string): string[] {
+  return sourceFiles(root)
+    .filter((file) => !file.startsWith(odaModule))
+    .filter((file) =>
+      odaHostPattern.test(readFileSync(join(root, file), "utf8")),
+    )
     .sort();
 }
 
@@ -343,6 +362,55 @@ describe("@vercel/oidc boundary", () => {
         "lib/a.ts",
         "lib/c.cjs",
         "tests/unit/other.test.ts",
+      ]);
+    });
+  });
+});
+
+describe("ODA host boundary", () => {
+  it("is named only by the ODA client", () => {
+    expect(findOdaViolations(repoRoot)).toEqual([]);
+  });
+
+  it("is actually named by the ODA client", () => {
+    const source = readFileSync(join(repoRoot, "lib/oda/client.ts"), "utf8");
+    expect(odaHostPattern.test(source)).toBe(true);
+  });
+
+  describe("on a fixture repository", () => {
+    let fixture: string;
+
+    afterEach(() => {
+      rmSync(fixture, { recursive: true, force: true });
+    });
+
+    function write(path: string, content: string) {
+      const full = join(fixture, path);
+      mkdirSync(join(full, ".."), { recursive: true });
+      writeFileSync(full, content);
+    }
+
+    it("fails on the host anywhere outside the ODA client", () => {
+      const upper = odaHost.toUpperCase();
+      fixture = mkdtempSync(join(tmpdir(), "lovvagt-boundaries-"));
+      write("lib/oda/client.ts", `const url = "https://${odaHost}/api";`);
+      write("lib/oda/nested/x.ts", `// ${odaHost}`);
+      write("lib/a.ts", `const url = "https://${odaHost}/api/Sag";`);
+      write("lib/oda-extra/b.ts", `// see ${odaHost}`);
+      write("app/c.tsx", `const host = "${upper}";`);
+      write("tests/unit/d.test.ts", `fetch("https://${odaHost}/api");`);
+      write("scripts/e.mjs", `const u = \`https://${odaHost}\`;`);
+      write("lib/ok.ts", `const other = "https://www.ft.dk/file.pdf";`);
+      write("tests/fixtures/oda/page.json", `{"url": "https://${odaHost}"}`);
+      write("README.md", `https://${odaHost}`);
+      write("node_modules/dep/index.js", `"${odaHost}";`);
+
+      expect(findOdaViolations(fixture)).toEqual([
+        "app/c.tsx",
+        "lib/a.ts",
+        "lib/oda-extra/b.ts",
+        "scripts/e.mjs",
+        "tests/unit/d.test.ts",
       ]);
     });
   });

@@ -1,0 +1,209 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#Sagstrin",
+  "value": [
+    {
+      "Sagstrinstype": {
+        "id": 31,
+        "type": "Fremsættelse",
+        "opdateringsdato": "2015-05-05T15:55:02.827"
+      },
+      "id": 263226,
+      "titel": "Fremsættelse",
+      "dato": "2025-02-26T00:00:00",
+      "sagid": 101039,
+      "typeid": 31,
+      "folketingstidendeurl": null,
+      "folketingstidende": "",
+      "folketingstidendesidenummer": "",
+      "statusid": 32,
+      "opdateringsdato": "2025-02-26T18:03:53.627"
+    },
+    {
+      "Sagstrinstype": {
+        "id": 32,
+        "type": "Lovforslag som fremsat",
+        "opdateringsdato": "2015-05-27T13:49:30.737"
+      },
+      "id": 263227,
+      "titel": "Lovforslag som fremsat",
+      "dato": "2025-02-26T00:00:00",
+      "sagid": 101039,
+      "typeid": 32,
+      "folketingstidendeurl": null,
+      "folketingstidende": "",
+      "folketingstidendesidenummer": "",
+      "statusid": 33,
+      "opdateringsdato": "2026-07-18T06:06:31.087"
+    },
+    {
+      "Sagstrinstype": {
+        "id": 12,
+        "type": "1. behandling",
+        "opdateringsdato": "2015-06-09T13:59:22.567"
+      },
+      "id": 263228,
+      "titel": "1. behandling",
+      "dato": "2025-03-13T00:00:00",
+      "sagid": 101039,
+      "typeid": 12,
+      "folketingstidendeurl": null,
+      "folketingstidende": "",
+      "folketingstidendesidenummer": "",
+      "statusid": 34,
+      "opdateringsdato": "2026-07-18T06:06:32.087"
+    },
+    {
+      "Sagstrinstype": {
+        "id": 33,
+        "type": "Frist for spørgsmål",
+        "opdateringsdato": "2015-06-09T13:53:46.097"
+      },
+      "id": 263229,
+      "titel": "Frist for spørgsmål",
+      "dato": "2025-03-28T00:00:00",
+      "sagid": 101039,
+      "typeid": 33,
+      "folketingstidendeurl": null,
+      "folketingstidende": "",
+      "folketingstidendesidenummer": "",
+      "statusid": 43,
+      "opdateringsdato": "2025-03-20T11:36:03.337"
+    },
+    {
+      "Sagstrinstype": {
+        "id": 34,
+        "type": "Frist for svar",
+        "opdateringsdato": "2015-06-09T13:53:46.097"
+      },
+      "id": 263230,
+      "titel": "Frist for svar",
+      "dato": "2025-04-11T00:00:00",
+      "sagid": 101039,
+      "typeid": 34,
+      "folketingstidendeurl": null,
+      "folketingstidende": "",
+      "folketingstidendesidenummer": "",
+      "statusid": 44,
+      "opdateringsdato": "2025-03-20T11:36:30.227"
+    },
+    {
+      "Sagstrinstype": {
+        "id": 35,
+        "type": "Udvalgsbehandling",
+        "opdateringsdato": "2015-06-09T13:53:46.097"
+      },
+      "id": 263231,
+      "titel": "Politisk drøftelse",
+      "dato": "2025-04-30T00:00:00",
+      "sagid": 101039,
+      "typeid": 35,
+      "folketingstidendeurl": null,
+      "folketingstidende": "",
+      "folketingstidendesidenummer": "",
+      "statusid": 45,
+      "opdateringsdato": "2026-07-18T06:06:32.357"
+    },
+    {
+      "Sagstrinstype": {
+        "id": 14,
+        "type": "Betænkning",
+        "opdateringsdato": "2015-05-27T13:49:30.737"
+      },
+      "id": 263233,
+      "titel": "Betænkning",
+      "dato": "2025-04-30T00:00:00",
+      "sagid": 101039,
+      "typeid": 14,
+      "folketingstidendeurl": null,
+      "folketingstidende": "",
+      "folketingstidendesidenummer": "",
+      "statusid": 38,
+      "opdateringsdato": "2026-07-18T06:06:33.853"
+    },
+    {
+      "Sagstrinstype": {
+        "id": 35,
+        "type": "Udvalgsbehandling",
+        "opdateringsdato": "2015-06-09T13:53:46.097"
+      },
+      "id": 263234,
+      "titel": "Frist for ændringsforslag",
+      "dato": "2025-04-23T00:00:00",
+      "sagid": 101039,
+      "typeid": 35,
+      "folketingstidendeurl": null,
+      "folketingstidende": "",
+      "folketingstidendesidenummer": "",
+      "statusid": 45,
+      "opdateringsdato": "2026-07-18T06:06:34.183"
+    },
+    {
+      "Sagstrinstype": {
+        "id": 15,
+        "type": "2. behandling",
+        "opdateringsdato": "2015-05-21T11:50:25.77"
+      },
+      "id": 263235,
+      "titel": "2. behandling",
+      "dato": "2025-05-06T00:00:00",
+      "sagid": 101039,
+      "typeid": 15,
+      "folketingstidendeurl": null,
+      "folketingstidende": "",
+      "folketingstidendesidenummer": "",
+      "statusid": 39,
+      "opdateringsdato": "2026-07-18T06:06:35.17"
+    },
+    {
+      "Sagstrinstype": {
+        "id": 17,
+        "type": "3. behandling",
+        "opdateringsdato": "2015-04-17T11:36:50.753"
+      },
+      "id": 263237,
+      "titel": "3. behandling",
+      "dato": "2025-05-08T00:00:00",
+      "sagid": 101039,
+      "typeid": 17,
+      "folketingstidendeurl": null,
+      "folketingstidende": "",
+      "folketingstidendesidenummer": "",
+      "statusid": 41,
+      "opdateringsdato": "2026-07-18T06:06:35.43"
+    },
+    {
+      "Sagstrinstype": {
+        "id": 37,
+        "type": "Lovforslag som vedtaget",
+        "opdateringsdato": "2014-10-29T15:31:48.81"
+      },
+      "id": 263238,
+      "titel": "Lovforslag som vedtaget",
+      "dato": "2025-05-08T00:00:00",
+      "sagid": 101039,
+      "typeid": 37,
+      "folketingstidendeurl": null,
+      "folketingstidende": "",
+      "folketingstidendesidenummer": "",
+      "statusid": 42,
+      "opdateringsdato": "2026-07-18T06:06:35.93"
+    },
+    {
+      "Sagstrinstype": {
+        "id": 51,
+        "type": "Lovforslaget optrykt efter 2. behandling",
+        "opdateringsdato": "2014-09-16T16:17:46.267"
+      },
+      "id": 266037,
+      "titel": "Lovforslaget optrykt efter 2. behandling",
+      "dato": "2025-05-06T00:00:00",
+      "sagid": 101039,
+      "typeid": 51,
+      "folketingstidendeurl": null,
+      "folketingstidende": "Tillæg H",
+      "folketingstidendesidenummer": "",
+      "statusid": 46,
+      "opdateringsdato": "2025-05-06T15:05:08.437"
+    }
+  ]
+}

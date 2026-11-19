@@ -1,0 +1,11 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#Emneord",
+  "value": [
+    {
+      "id": 33142,
+      "typeid": 1,
+      "emneord": "forsvaret",
+      "opdateringsdato": "2026-11-19T17:15:07.763"
+    }
+  ]
+}

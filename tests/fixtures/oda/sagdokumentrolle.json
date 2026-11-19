@@ -1,0 +1,40 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#SagDokumentRolle",
+  "value": [
+    {
+      "id": 1,
+      "rolle": "Tidl. jour. på",
+      "opdateringsdato": "2014-09-19T14:51:24.773"
+    },
+    {
+      "id": 2,
+      "rolle": "Parallelomdelt på",
+      "opdateringsdato": "2014-10-06T13:54:15.487"
+    },
+    {
+      "id": 3,
+      "rolle": "På sagstrin",
+      "opdateringsdato": "2015-05-12T14:33:34.01"
+    },
+    {
+      "id": 4,
+      "rolle": "Hovedtilknytning",
+      "opdateringsdato": "2015-07-15T09:44:04.857"
+    },
+    {
+      "id": 5,
+      "rolle": "Se også",
+      "opdateringsdato": "2014-09-19T14:24:18.41"
+    },
+    {
+      "id": 6,
+      "rolle": "Relation",
+      "opdateringsdato": "2014-06-24T15:13:41.907"
+    },
+    {
+      "id": 7,
+      "rolle": "Child",
+      "opdateringsdato": "2014-06-24T15:13:41.907"
+    }
+  ]
+}

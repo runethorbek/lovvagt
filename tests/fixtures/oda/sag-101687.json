@@ -1,0 +1,36 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#Sag",
+  "value": [
+    {
+      "id": 101687,
+      "typeid": 3,
+      "kategoriid": 13,
+      "statusid": 11,
+      "titel": "Forslag til lov om ændring af lov om forsvarets formål, opgaver og organisation m.v. (Bekæmpelse af ulovlig droneaktivitet ved militære områder m.v.)",
+      "titelkort": "Om bekæmpelse af ulovlig droneaktivitet ved militære områder m.v.",
+      "offentlighedskode": "O",
+      "nummer": "L 211",
+      "nummerprefix": "L",
+      "nummernumerisk": "211",
+      "nummerpostfix": "",
+      "resume": "Lovforslagets formål er at give Forsvaret hjemmel til at neutralisere droner, der ulovligt befinder sig i en flyveforbudszone, ved militære områder, midlertidige militære områder, flådefartøjer, militære luftfartøjer og afmærkede militærkolonner samt ved slotte under Forsvarets bevogtning. \n\nDerudover indebærer lovforslaget, at Forsvaret i øvelsesøjemed og efter samtykke fra droneejeren eller fjernpiloten kan neutralisere droner, der befinder sig i de nævnte flyveforbudszoner.\n\nBaggrunden for lovforslaget er, at Forsvaret gennem de seneste år har oplevet en øget ulovlig droneaktivitet ved bl.a. militære områder. Samtidig bliver droner i stigende grad anvendt til bl.a. spionage, sabotage og terrorisme. Derudover kan droner ved deres blotte tilstedeværelse forstyrre Forsvarets aktiviteter, herunder påvirke flyvesikkerheden ved militære flyvestationer.\n\nDet er i den forbindelse afgørende, at Forsvaret har mulighed for at reagere hurtigt og effektivt på droner, der ulovligt befinder sig i de pågældende flyveforbudszoner. ",
+      "afstemningskonklusion": "For stemte 108 (S, V, DD, SF, LA, M, KF, EL, DF, RV, ALT, BP, Mike Villa Fonseca (UFG), Jon Stephensen (UFG),  Jeppe Søe (UFG)) imod stemte 0 hverken for eller imod stemte 0",
+      "periodeid": 163,
+      "afgørelsesresultatkode": null,
+      "baggrundsmateriale": null,
+      "opdateringsdato": "2025-07-25T12:35:04.057",
+      "statsbudgetsag": false,
+      "begrundelse": null,
+      "paragrafnummer": null,
+      "paragraf": null,
+      "afgørelsesdato": null,
+      "afgørelse": null,
+      "rådsmødedato": null,
+      "lovnummer": "714",
+      "lovnummerdato": "2025-06-20T00:00:00",
+      "retsinformationsurl": null,
+      "fremsatundersagid": null,
+      "deltundersagid": null
+    }
+  ]
+}

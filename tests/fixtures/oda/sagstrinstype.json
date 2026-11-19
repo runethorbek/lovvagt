@@ -1,0 +1,21 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#Sagstrinstype",
+  "value": [
+    {
+      "id": 1,
+      "type": "Anmeldelse",
+      "opdateringsdato": "2015-06-01T09:02:44.147"
+    },
+    {
+      "id": 2,
+      "type": "Afgivelse",
+      "opdateringsdato": "2014-10-09T10:07:46.277"
+    },
+    {
+      "id": 3,
+      "type": "Forhandling",
+      "opdateringsdato": "2014-09-08T15:24:06.033"
+    }
+  ],
+  "odata.nextLink": "https://oda.ft.dk/api/Sagstrinstype?$format=json&$skip=100"
+}

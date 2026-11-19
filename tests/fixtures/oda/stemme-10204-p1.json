@@ -1,0 +1,27 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#Stemme",
+  "value": [
+    {
+      "id": 2289592,
+      "typeid": 3,
+      "afstemningid": 10204,
+      "aktørid": 18713,
+      "opdateringsdato": "2025-05-08T10:01:20.383"
+    },
+    {
+      "id": 2289593,
+      "typeid": 1,
+      "afstemningid": 10204,
+      "aktørid": 102,
+      "opdateringsdato": "2025-05-08T10:01:20.383"
+    },
+    {
+      "id": 2289594,
+      "typeid": 1,
+      "afstemningid": 10204,
+      "aktørid": 217,
+      "opdateringsdato": "2025-05-08T10:01:20.383"
+    }
+  ],
+  "odata.nextLink": "https://oda.ft.dk/api/Stemme?$filter=afstemningid%20eq%2010204&$format=json&$skip=100"
+}
