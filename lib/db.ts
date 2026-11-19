@@ -14,6 +14,42 @@ export function db(): NeonQueryFunction<false, false> {
   return neon(config.database().url);
 }
 
+/** One SQL statement with `$1`-style placeholders. */
+export type SqlStatement = { text: string; params?: unknown[] };
+
+/**
+ * A minimal SQL interface that both Neon (here) and the PGlite test harness
+ * (`tests/support/pglite.ts`) implement, so SQL can be tested without a
+ * network connection.
+ *
+ * - `query` runs one statement and returns its rows.
+ * - `transaction` runs the statements, in order, in a single transaction:
+ *   either all of them take effect or none do. It is non-interactive (the
+ *   statements are fixed up front), because that is what Neon's HTTP driver
+ *   supports.
+ *
+ * Errors are the driver's own. Callers must not pass their messages on.
+ */
+export interface SqlExecutor {
+  query(text: string, params?: unknown[]): Promise<Record<string, unknown>[]>;
+  transaction(statements: readonly SqlStatement[]): Promise<void>;
+}
+
+/** A `SqlExecutor` for the pooled `DATABASE_URL`, over Neon's HTTP driver. */
+export function executor(): SqlExecutor {
+  const sql = db();
+  return {
+    async query(text, params) {
+      return sql.query(text, params ?? []);
+    },
+    async transaction(statements) {
+      await sql.transaction(
+        statements.map(({ text, params }) => sql.query(text, params ?? [])),
+      );
+    },
+  };
+}
+
 /**
  * Fixed error messages. Driver errors can contain the connection string,
  * host, user or password, so their text is never passed through.
