@@ -391,6 +391,7 @@ async function billsUnit(
  * kept with `matching = false`.
  *
  * A unit is one page of bills (`pageSize`, by ascending id) in one session.
+ * A session ends with a unit that finds no more bills.
  * SagAktør and EmneordSag are fetched only for bills whose Sag changed:
  * ODA updates a bill's `opdateringsdato` together with its SagAktør and
  * EmneordSag rows. Changes to an Aktør or Emneord row alone are picked up
@@ -451,7 +452,9 @@ export async function ingestBills(
     cursor = {
       ...cursor,
       highest: highest?.toISOString() ?? null,
-      ...(bills.length < pageSize
+      // Only an empty page ends a session: ODA may return fewer rows than
+      // `$top` while more exist.
+      ...(bills.length === 0
         ? { sessionIndex: cursor.sessionIndex + 1, afterId: 0 }
         : { afterId: Math.max(...bills.map((sag) => sag.id)) }),
     };

@@ -112,7 +112,10 @@ function odaResponse(text: string): Response {
     case "Sag": {
       const session = number(filter, /periodeid eq (\d+)/);
       const after = number(filter, /id gt (\d+)/) ?? 0;
-      const top = Number(url.searchParams.get("$top") ?? 100);
+      const top = Math.min(
+        Number(url.searchParams.get("$top") ?? 100),
+        serverPageSize,
+      );
       value = (session === 163 ? sagRows : [])
         .filter((row) => Number(row.id) > after)
         .sort((a, b) => Number(a.id) - Number(b.id))
@@ -138,6 +141,9 @@ function odaResponse(text: string): Response {
   return jsonResponse(JSON.stringify({ value }));
 }
 
+/** Rows per Sag page that the mocked server returns at most, below `$top`. */
+let serverPageSize = Infinity;
+
 let database: TestDatabase;
 let fetchMock: ReturnType<typeof mockFetch>;
 
@@ -153,6 +159,7 @@ beforeEach(async () => {
   await database.pg.exec(
     "TRUNCATE tracked_sag, sag, periode, aktoer, sag_aktoer, emneord, emneord_sag",
   );
+  serverPageSize = Infinity;
   fetchMock = mockFetch();
   fetchMock.mockImplementation(async (url) => odaResponse(String(url)));
 });
@@ -317,6 +324,7 @@ describe("ingestBills", () => {
       .filter((url) => entityOf(url) === "Sag");
     expect(sagUrls.map(filterOf)).toEqual([
       "typeid eq 3 and periodeid eq 163 and id gt 0",
+      "typeid eq 3 and periodeid eq 163 and id gt 101688",
       "typeid eq 3 and periodeid eq 165 and id gt 0",
       "typeid eq 3 and periodeid eq 167 and id gt 0",
       "typeid eq 3 and periodeid eq 168 and id gt 0",
@@ -424,6 +432,22 @@ describe("ingestBills", () => {
       "SELECT count(*)::int AS count FROM sag_aktoer",
     );
     expect(count).toBe(24);
+  });
+
+  it("continues a session after a page shorter than requested", async () => {
+    // The server returns two rows per page although $top asks for three.
+    serverPageSize = 2;
+    const result = await ingestBills(database.sql, { pageSize: 3 });
+    expect(result.done).toBe(true);
+    expect(await ids("sag")).toEqual(candidateIds);
+    expect(await tracked()).toEqual(expectedTracked);
+    const afterIds = requestedUrls(fetchMock)
+      .map((text) => new URL(text))
+      .filter((url) => entityOf(url) === "Sag")
+      .map(filterOf)
+      .filter((filter) => filter.includes("periodeid eq 163"))
+      .map((filter) => /id gt (\d+)/.exec(filter)?.[1]);
+    expect(afterIds).toEqual(["0", "99215", "101043", "101687", "101688"]);
   });
 
   it("returns its cursor unchanged when the signal stops a unit mid-way", async () => {
