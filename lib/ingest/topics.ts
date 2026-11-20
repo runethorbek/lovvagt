@@ -37,8 +37,9 @@
  * lists the exclusions that cancelled it in `excludedBy` (empty unless the
  * topic was cancelled).
  *
- * The rules are a typed object reviewed in pull requests. Tuning proposals
- * come from the dry run (`scripts/topics-dry-run.ts`).
+ * The rules are a typed object reviewed in pull requests: the seed from
+ * spec 002 plus the tuning approved in PR #49 on 2026-11-20. Tuning
+ * proposals come from the dry run (`scripts/topics-dry-run.ts`).
  */
 import type { Aktoer, EmneordSag, Sag, SagAktoer } from "@/lib/oda";
 
@@ -72,9 +73,11 @@ function stem(text: string): KeywordPattern {
 }
 
 /**
- * The seed rules approved in spec 002 (2026-11-19). Ministry names were
- * checked against ODA's `Aktør` table (typeid 1) on 2026-11-20 and include
- * every name in use since 2024.
+ * The seed rules approved in spec 002 (2026-11-19), plus the tuning the
+ * human approved after the dry run in PR #49 (2026-11-20): Emneord rules,
+ * more exclusions, two more `ai` keywords and one `ai` ministry dropped.
+ * Ministry names were checked against ODA's `Aktør` table (typeid 1) on
+ * 2026-11-20.
  */
 export const topicRules: readonly TopicRules[] = [
   {
@@ -90,8 +93,13 @@ export const topicRules: readonly TopicRules[] = [
       stem("krigs"),
       stem("drone"),
     ],
-    emneord: [],
-    exclusions: [stem("forsvarer"), stem("forsvarsadvokat")],
+    emneord: ["NATO"],
+    exclusions: [
+      stem("forsvarer"),
+      stem("forsvarsadvokat"),
+      stem("skydevåben"),
+      stem("krigsramte"),
+    ],
   },
   {
     topic: "security",
@@ -111,16 +119,18 @@ export const topicRules: readonly TopicRules[] = [
       stem("hybrid"),
       stem("sabotage"),
     ],
-    emneord: [],
-    exclusions: [],
+    emneord: ["cybersikkerhed og informationssikkerhed"],
+    exclusions: [stem("terrorfinansiering"), stem("hvidvask")],
   },
   {
     topic: "ai",
     ministries: [
       // Aktør 20986, 2024-08-29 to 2026-06-03.
       "Digitaliseringsministeriet",
-      // Aktør 21435, from 2026-06-03.
-      "Forsknings-, Uddannelses- og Digitaliseringsministeriet",
+      // Not listed: "Forsknings-, Uddannelses- og Digitaliseringsministeriet"
+      // (Aktør 21435, from 2026-06-03). It also covers education, and most
+      // of its bills matched only through it. Dropped by human decision on
+      // 2026-11-20 (PR #49); do not re-add it as a missing name.
       // Aktør 20431, 2022-12-15 to 2024-08-29. Not in the seed table; added
       // because the spec asks for every name in use since 2024.
       "Ministeriet for Digitalisering og Ligestilling",
@@ -128,6 +138,8 @@ export const topicRules: readonly TopicRules[] = [
     keywords: [
       stem("kunstig intelligens"),
       stem("AI-forordning"),
+      stem("AI-system"),
+      stem("AI-lov"),
       stem("forordningen om kunstig intelligens"),
       stem("algoritm"),
       stem("automatiseret afgørelse"),

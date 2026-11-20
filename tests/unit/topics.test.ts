@@ -125,6 +125,19 @@ describe("known bills from 2024-25", () => {
       ],
     });
   });
+
+  it("matches L 188 and L 141 on their Emneord too", () => {
+    expect(
+      topicMatch(matchTopics(fixtureInput(101403)), "defence").matchedRules,
+    ).toContainEqual({ kind: "emneord", value: "NATO", field: "emneord" });
+    expect(
+      topicMatch(matchTopics(fixtureInput(69354)), "security").matchedRules,
+    ).toContainEqual({
+      kind: "emneord",
+      value: "cybersikkerhed og informationssikkerhed",
+      field: "emneord",
+    });
+  });
 });
 
 describe("topicInput", () => {
@@ -168,6 +181,31 @@ describe("topicInput", () => {
 });
 
 describe("exclusions", () => {
+  it("from the tuning cancel keyword-only security and defence matches", () => {
+    const security = topicMatch(
+      matchTopics(input({ titel: "Om hvidvask og terrorfinansiering" })),
+      "security",
+    );
+    expect(security.matching).toBe(false);
+    expect(security.matchedRules).toEqual([
+      { kind: "keyword", value: "terror", field: "titel" },
+    ]);
+    expect(security.excludedBy).toEqual([
+      { value: "terrorfinansiering", field: "titel" },
+      { value: "hvidvask", field: "titel" },
+    ]);
+
+    const defence = topicMatch(
+      matchTopics(input({ titel: "Om krigsramte og skydevåben" })),
+      "defence",
+    );
+    expect(defence.matching).toBe(false);
+    expect(defence.excludedBy).toEqual([
+      { value: "skydevåben", field: "titel" },
+      { value: "krigsramte", field: "titel" },
+    ]);
+  });
+
   it("cancel a keyword-only match and are reported", () => {
     const result = topicMatch(
       matchTopics(
@@ -301,6 +339,40 @@ describe("keyword patterns", () => {
     );
     expect(result.matching).toBe(false);
     expect(result.matchedRules).toEqual([]);
+  });
+});
+
+describe("ai rules", () => {
+  it("do not list the merged education and digitalisation ministry", () => {
+    const merged = topicMatch(
+      matchTopics(
+        input({
+          ministries: [
+            "Forsknings-, Uddannelses- og Digitaliseringsministeriet",
+          ],
+        }),
+      ),
+      "ai",
+    );
+    expect(merged.matching).toBe(false);
+    expect(merged.matchedRules).toEqual([]);
+
+    const digital = topicMatch(
+      matchTopics(input({ ministries: ["Digitaliseringsministeriet"] })),
+      "ai",
+    );
+    expect(digital.matching).toBe(true);
+  });
+
+  it("match AI-system and AI-lov stems", () => {
+    const result = topicMatch(
+      matchTopics(input({ titel: "Om AI-systemer", resume: "En ny AI-lov." })),
+      "ai",
+    );
+    expect(result.matchedRules).toEqual([
+      { kind: "keyword", value: "AI-system", field: "titel" },
+      { kind: "keyword", value: "AI-lov", field: "resume" },
+    ]);
   });
 });
 
