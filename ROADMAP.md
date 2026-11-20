@@ -11,13 +11,12 @@ Update **Where we are** at the end of every work session.
 
 **Next action:**
 
-1. Human sets `agent:ready` on #35 (topic rules) and runs
-   `/build-slice 35`; then #36 → #37 (metadata only, not affected by the
-   file block below).
-2. Human asks Folketinget whether automated access to `Fil.filurl`
-   documents on `www.ft.dk` is intended, or whether there is another source.
-3. Human deletes the probe branch:
-   `git push origin --delete chore/38-ftdk-download-probe`.
+1. Human runs `/build-slice 35` (topic rules, `agent:ready`); then
+   #36 → #37 (metadata only, not affected by the file block below). The
+   ODA findings for each are in comments on #35, #36, #37 and #39.
+2. Human sends the drafted email to Folketingets Informationscenter
+   (`fo@ft.dk`) about automated access to `Fil.filurl` documents.
+3. Human decides on the committee-referral rule kind proposed on #35.
 
 **Blocked on:** #38 (`needs-human`): `www.ft.dk`, where bill files are
 served, answers automated clients with a Cloudflare challenge (HTTP 403,
@@ -25,6 +24,8 @@ served, answers automated clients with a Cloudflare challenge (HTTP 403,
 Preview function (probe, 2026-11-20). The ODA API is not affected. #39
 depends on #38, so decide whether #39 goes ahead without the file step.
 #38 also still needs the Blob usage check (spec 002 prerequisite).
+ODA's other sources do not help: the nightly database backup is metadata
+only, and the anonymous FTP holds only debate transcripts.
 
 ## How to resume after a break
 
@@ -95,6 +96,7 @@ they become relevant.
 | ODA client follow-ups (#46 review): abort while waiting for the lock; redirect hops; `fetchDokument`/`fetchFil` tests                     | Phase 8                    |
 | Formatter from a UTC watermark to an ODA local-time `datetime'…'` filter value                                                            | #36                        |
 | Preview `CRON_SECRET` replaced 2026-11-20 (Sensitive, cannot be read back); keep the value outside Vercel                                 | Any Preview check          |
+| ODA bulk sources: nightly `oda.bak` (SQL Server, metadata) and debate transcripts on `ftp://oda.ft.dk/ODAXML/Referat/`                    | Phase 6 (transcripts)      |
 | Consider moving the repo into the WSL file system if the container feels slow                                                             | Any time                   |
 | Vercel Hobby is for non-commercial use; revisit if Lovvagt becomes a product                                                              | Before any commercial use  |
 
@@ -116,6 +118,10 @@ they become relevant.
 
 Newest first. One or two lines per session.
 
+- **2026-11-20** – Read ODA's browser guide: no other source for bill
+  files (backup is metadata, FTP only transcripts); contact is likely
+  `fo@ft.dk`, email drafted. Posted ODA findings on #35, #36, #37, #39;
+  probe branch deleted.
 - **2026-11-20** – Agent implemented #34 with `/build-slice` (#46, two
   review rounds): ODA client in `lib/oda/` with recorded fixtures; live API
   check confirmed ODA timestamps are Copenhagen local time (winter). Found
