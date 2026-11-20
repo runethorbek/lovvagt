@@ -1,0 +1,128 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#SagDokument",
+  "value": [
+    {
+      "Dokument": {
+        "Fil": [
+          {
+            "id": 2141563,
+            "dokumentid": 1149609,
+            "titel": "DK96",
+            "versionsdato": "2025-02-26T13:34:15",
+            "filurl": "https://www.ft.dk/ripdf/samling/20241/lovforslag/l154/20241_l154_som_fremsat.pdf",
+            "opdateringsdato": "2025-02-26T13:34:40.997",
+            "variantkode": "P",
+            "format": "PDF"
+          }
+        ],
+        "id": 1149609,
+        "typeid": 21,
+        "kategoriid": 31,
+        "statusid": 1,
+        "offentlighedskode": "O",
+        "titel": "Fremsat den 26. februar 2025 af minister for digitalisering (Caroline Stage Olsen)",
+        "dato": "2025-02-26T13:34:32.84",
+        "modtagelsesdato": "2025-02-26T13:34:01",
+        "frigivelsesdato": "2025-02-26T13:34:01",
+        "paragraf": "",
+        "paragrafnummer": "",
+        "spørgsmålsordlyd": null,
+        "spørgsmålstitel": null,
+        "spørgsmålsid": null,
+        "procedurenummer": "",
+        "grundnotatstatus": "",
+        "dagsordenudgavenummer": null,
+        "opdateringsdato": "2025-02-26T13:34:32.84"
+      },
+      "id": 1463071,
+      "sagid": 101039,
+      "dokumentid": 1149609,
+      "bilagsnummer": "",
+      "frigivelsesdato": "2025-02-26T00:00:00",
+      "opdateringsdato": "2025-02-26T13:34:32.84",
+      "rolleid": 3
+    },
+    {
+      "Dokument": {
+        "Fil": [
+          {
+            "id": 2160196,
+            "dokumentid": 1157935,
+            "titel": "DIU L 154 - svar på spm. 1.pdf",
+            "versionsdato": "2025-04-09T08:53:48",
+            "filurl": "https://www.ft.dk/samling/20241/lovforslag/l154/spm/1/svar/2128554/3003008.pdf",
+            "opdateringsdato": "2025-04-12T04:45:22.597",
+            "variantkode": "P",
+            "format": "PDF"
+          }
+        ],
+        "id": 1157935,
+        "typeid": 17,
+        "kategoriid": 22,
+        "statusid": 1,
+        "offentlighedskode": "O",
+        "titel": "L 154 - svar på spm. 1 om, hvorfor der i forslaget er indarbejdet et tilsyn uden retskendelse",
+        "dato": "2025-04-09T08:52:35",
+        "modtagelsesdato": "2025-04-09T08:53:48",
+        "frigivelsesdato": "2025-04-09T09:16:46",
+        "paragraf": "",
+        "paragrafnummer": "",
+        "spørgsmålsordlyd": "Vil ministeren oplyse årsagen til, at der i lovforslaget er indarbejdet et tilsyn uden retskendelse, når flere høringsparter herunder Danske Advokater kritiserer dette som en unødvendig skærpelse af reglerne i forhold til EU reglerne? Der henvises til lovforslagets bilag 1.",
+        "spørgsmålstitel": "Spm. om, hvorfor der i forslaget er indarbejdet et tilsyn uden retskendelse",
+        "spørgsmålsid": 1152022,
+        "procedurenummer": "",
+        "grundnotatstatus": "",
+        "dagsordenudgavenummer": null,
+        "opdateringsdato": "2025-04-09T09:17:06.283"
+      },
+      "id": 1470696,
+      "sagid": 101039,
+      "dokumentid": 1157935,
+      "bilagsnummer": "Spørgsmål 1",
+      "frigivelsesdato": "2025-04-09T00:00:00",
+      "opdateringsdato": "2025-04-09T09:17:06.283",
+      "rolleid": 4
+    },
+    {
+      "Dokument": {
+        "Fil": [
+          {
+            "id": 2175088,
+            "dokumentid": 1163672,
+            "titel": "AX31286",
+            "versionsdato": "2025-05-08T10:37:09",
+            "filurl": "https://www.ft.dk/ripdf/samling/20241/lovforslag/l154/20241_l154_som_vedtaget.pdf",
+            "opdateringsdato": "2025-05-08T10:37:26.823",
+            "variantkode": "P",
+            "format": "PDF"
+          }
+        ],
+        "id": 1163672,
+        "typeid": 21,
+        "kategoriid": 23,
+        "statusid": 1,
+        "offentlighedskode": "O",
+        "titel": "Vedtaget af Folketinget ved 3. behandling den 8. maj 2025",
+        "dato": "2025-05-08T10:37:23.127",
+        "modtagelsesdato": "2025-05-08T10:36:57",
+        "frigivelsesdato": "2025-05-08T10:36:57",
+        "paragraf": "",
+        "paragrafnummer": "",
+        "spørgsmålsordlyd": null,
+        "spørgsmålstitel": null,
+        "spørgsmålsid": null,
+        "procedurenummer": "",
+        "grundnotatstatus": "",
+        "dagsordenudgavenummer": null,
+        "opdateringsdato": "2025-05-08T10:37:23.127"
+      },
+      "id": 1476209,
+      "sagid": 101039,
+      "dokumentid": 1163672,
+      "bilagsnummer": "",
+      "frigivelsesdato": "2025-05-08T00:00:00",
+      "opdateringsdato": "2025-05-08T10:37:23.127",
+      "rolleid": 3
+    }
+  ]
+}

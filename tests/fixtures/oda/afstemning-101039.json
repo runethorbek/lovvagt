@@ -1,0 +1,16 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#Afstemning",
+  "value": [
+    {
+      "id": 10204,
+      "nummer": 294,
+      "konklusion": "Vedtaget\nFor stemte 109 (S, V, DD, SF, LA, M, KF, EL, DF, RV, ALT, BP, Jon Stephensen (UFG), Mike Villa Fonseca (UFG), Jeppe Søe (UFG)) \nimod stemte 0 \nhverken for eller imod stemte 0 ",
+      "vedtaget": true,
+      "kommentar": null,
+      "mødeid": 14624,
+      "typeid": 1,
+      "sagstrinid": 263237,
+      "opdateringsdato": "2025-05-08T10:01:20.4"
+    }
+  ]
+}

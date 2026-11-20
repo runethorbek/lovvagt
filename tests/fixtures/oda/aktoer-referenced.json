@@ -1,0 +1,57 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#Akt%C3%B8r",
+  "value": [
+    {
+      "id": 8,
+      "typeid": 2,
+      "gruppenavnkort": "forsvarsminister",
+      "navn": "forsvarsministeren",
+      "fornavn": null,
+      "efternavn": null,
+      "biografi": null,
+      "periodeid": null,
+      "opdateringsdato": "2026-11-19T19:17:04.53",
+      "startdato": "2026-06-03T00:00:00",
+      "slutdato": null
+    },
+    {
+      "id": 11,
+      "typeid": 1,
+      "gruppenavnkort": null,
+      "navn": "Forsvarsministeriet",
+      "fornavn": null,
+      "efternavn": null,
+      "biografi": null,
+      "periodeid": null,
+      "opdateringsdato": "2026-06-03T10:08:10.937",
+      "startdato": "1953-09-30T00:00:00",
+      "slutdato": null
+    },
+    {
+      "id": 206,
+      "typeid": 5,
+      "gruppenavnkort": null,
+      "navn": "Troels Lund Poulsen",
+      "fornavn": "Troels Lund",
+      "efternavn": "Poulsen",
+      "biografi": "<member><url/><status>1</status><sex>Mand</sex><educationStatistic>Gymnasial</educationStatistic><occupationStatistic>Selv</occupationStatistic><title>Troels Lund Poulsen (V)</title><firstname>Troels ",
+      "periodeid": null,
+      "opdateringsdato": "2026-11-19T19:13:09.777",
+      "startdato": null,
+      "slutdato": null
+    },
+    {
+      "id": 21041,
+      "typeid": 3,
+      "gruppenavnkort": "FOU",
+      "navn": "Forsvars-, Samfundssikkerheds- og Beredskabsudvalget",
+      "fornavn": null,
+      "efternavn": null,
+      "biografi": null,
+      "periodeid": 163,
+      "opdateringsdato": "2026-11-19T19:20:06.047",
+      "startdato": "2024-10-01T00:00:00",
+      "slutdato": "2025-10-07T00:00:00"
+    }
+  ]
+}
