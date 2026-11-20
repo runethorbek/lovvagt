@@ -106,3 +106,25 @@ export function parseOdaTimestamp(text: string): Date {
   if (!date) throw new RangeError("invalid ODA timestamp");
   return date;
 }
+
+const pad = (value: number, length = 2) => String(value).padStart(length, "0");
+
+/**
+ * Formats a UTC instant as an ODA timestamp: `Europe/Copenhagen` wall-clock
+ * time without offset or fraction, e.g. `2026-11-18T14:31:51`, for filters
+ * such as `opdateringsdato gt datetime'2026-11-18T14:31:51'`. Milliseconds
+ * are dropped (rounded down), so the literal is never later than the instant.
+ *
+ * During the autumn transition one local hour occurs twice, so instants an
+ * hour apart can format the same. Callers that filter by watermark start an
+ * hour before it (spec 002, deliverable 4), which absorbs this.
+ */
+export function formatOdaTimestamp(instant: Date): string {
+  const time = instant.getTime();
+  if (Number.isNaN(time)) throw new RangeError("invalid date");
+  const parts: Record<string, number> = {};
+  for (const part of formatter.formatToParts(instant)) {
+    if (part.type !== "literal") parts[part.type] = Number(part.value);
+  }
+  return `${pad(parts.year, 4)}-${pad(parts.month)}-${pad(parts.day)}T${pad(parts.hour)}:${pad(parts.minute)}:${pad(parts.second)}`;
+}

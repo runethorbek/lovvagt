@@ -1,9 +1,12 @@
 # ODA fixtures
 
 Real responses from Folketingets Åbne Data (ODA), recorded on 2026-11-19
-(unless noted) and used by the ODA client tests (`tests/unit/oda-*.test.ts`)
-and the topic rule tests (`tests/unit/topics.test.ts`). Tests never call
-ODA; they serve these files through a mocked `fetch`.
+(unless noted) and used by the ODA client tests (`tests/unit/oda-*.test.ts`),
+the topic rule tests (`tests/unit/topics.test.ts`) and the ingest tests
+(`tests/unit/ingest-*.test.ts`). Tests never call ODA; they serve these files
+through a mocked `fetch`. The ingest step tests compose recorded rows into
+responses (e.g. SagAktør rows with their `SagAktørRolle` row nested, as
+`$expand=SagAktørRolle` returns them) without changing field values.
 
 The files are trimmed to keep them small. Field values are never changed:
 
