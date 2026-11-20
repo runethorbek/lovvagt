@@ -5,19 +5,26 @@ Update **Where we are** at the end of every work session.
 
 ## Where we are
 
-**Last updated:** 2026-11-19
+**Last updated:** 2026-11-20
 
 **Current phase:** 2 – Ingest (spec 002, epic #32)
 
 **Next action:**
 
-1. Human runs `/build-slice 34` (ODA client, `agent:ready`): first issue
-   implemented through the orchestrated implementer/reviewer loop.
-2. Human sets `agent:ready` on #35 (topic rules) once #34 is merged; then
-   #36 → #37 → #38 → #39 in order.
+1. Human sets `agent:ready` on #35 (topic rules) and runs
+   `/build-slice 35`; then #36 → #37 (metadata only, not affected by the
+   file block below).
+2. Human asks Folketinget whether automated access to `Fil.filurl`
+   documents on `www.ft.dk` is intended, or whether there is another source.
+3. Human deletes the probe branch:
+   `git push origin --delete chore/38-ftdk-download-probe`.
 
-**Blocked on:** #38 needs the human to check Blob usage for both stores in
-the Vercel dashboard (spec 002 prerequisite).
+**Blocked on:** #38 (`needs-human`): `www.ft.dk`, where bill files are
+served, answers automated clients with a Cloudflare challenge (HTTP 403,
+`cf-mitigated: challenge`), both from the dev environment and from a Vercel
+Preview function (probe, 2026-11-20). The ODA API is not affected. #39
+depends on #38, so decide whether #39 goes ahead without the file step.
+#38 also still needs the Blob usage check (spec 002 prerequisite).
 
 ## How to resume after a break
 
@@ -83,6 +90,11 @@ they become relevant.
 | Blob OIDC token outside a request (Workflow steps, cron): check how Vercel delivers it there (ADR 0005)                                   | Phase 8                    |
 | Gemini free-tier limits are not published per model; watch the AI Studio rate-limit dashboard (limits are per project)                    | Phase 4                    |
 | Gemini health check takes ~8 s against a 10 s timeout (`checkTimeoutMs`); raise it or give Gemini its own timeout if it starts timing out | Phase 4                    |
+| `www.ft.dk` bill files blocked by a Cloudflare challenge (dev and Vercel); ask Folketinget, do not circumvent                             | #38, phase 3               |
+| ODA timestamps verified as Copenhagen time in winter only; re-check summer time after 2027-03-28                                          | `docs/ingest.md` (#39)     |
+| ODA client follow-ups (#46 review): abort while waiting for the lock; redirect hops; `fetchDokument`/`fetchFil` tests                     | Phase 8                    |
+| Formatter from a UTC watermark to an ODA local-time `datetime'…'` filter value                                                            | #36                        |
+| Preview `CRON_SECRET` replaced 2026-11-20 (Sensitive, cannot be read back); keep the value outside Vercel                                 | Any Preview check          |
 | Consider moving the repo into the WSL file system if the container feels slow                                                             | Any time                   |
 | Vercel Hobby is for non-commercial use; revisit if Lovvagt becomes a product                                                              | Before any commercial use  |
 
@@ -104,6 +116,11 @@ they become relevant.
 
 Newest first. One or two lines per session.
 
+- **2026-11-20** – Agent implemented #34 with `/build-slice` (#46, two
+  review rounds): ODA client in `lib/oda/` with recorded fixtures; live API
+  check confirmed ODA timestamps are Copenhagen local time (winter). Found
+  that `www.ft.dk` file downloads get a Cloudflare challenge from dev and
+  from Vercel (throwaway probe); #38 labelled `needs-human`.
 - **2026-11-19** – Added shared Claude Code skills from
   `runethorbek/skills` via a sync workflow (#43, #44): `/build-slice` with
   `slice-implementer`/`slice-reviewer` subagents, `/agent-ready`,
