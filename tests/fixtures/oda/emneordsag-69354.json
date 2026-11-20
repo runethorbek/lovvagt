@@ -1,0 +1,29 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#EmneordSag",
+  "value": [
+    {
+      "Emneord": {
+        "id": 85673,
+        "typeid": 4,
+        "emneord": "Forsvarsv\u00e6sen A 62",
+        "opdateringsdato": "2026-10-29T15:29:38.927"
+      },
+      "id": 880270,
+      "emneordid": 85673,
+      "sagid": 69354,
+      "opdateringsdato": "2025-05-07T09:41:29.257"
+    },
+    {
+      "Emneord": {
+        "id": 85385,
+        "typeid": 1,
+        "emneord": "cybersikkerhed og informationssikkerhed",
+        "opdateringsdato": "2026-11-19T12:46:16.417"
+      },
+      "id": 880271,
+      "emneordid": 85385,
+      "sagid": 69354,
+      "opdateringsdato": "2025-05-07T09:41:29.257"
+    }
+  ]
+}

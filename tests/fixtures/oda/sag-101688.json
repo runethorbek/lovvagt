@@ -1,0 +1,36 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#Sag",
+  "value": [
+    {
+      "id": 101688,
+      "typeid": 3,
+      "kategoriid": 13,
+      "statusid": 11,
+      "titel": "Forslag til lov om \u00e6ndring af lov om fasts\u00e6ttelse af udgiftslofter for stat, kommuner og regioner for finans\u00e5ret 2025, lov om fasts\u00e6ttelse af udgiftslofter for stat, kommuner og regioner for finans\u00e5ret 2026, lov om fasts\u00e6ttelse af udgiftslofter for stat, kommuner og regioner for finans\u00e5ret 2027 og lov om fasts\u00e6ttelse af udgiftslofter for stat, kommuner og regioner for finans\u00e5ret 2028. (Konsekvenser af \u00bbAftale om styrkelse af Forsvarets kampkraft\u00ab af februar 2025 m.v.).",
+      "titelkort": "Om konsekvenser af \u00bbAftale om styrkelse af Forsvarets kampkraft\u00ab af 22. februar 2025 m.v.",
+      "offentlighedskode": "O",
+      "nummer": "L 210",
+      "nummerprefix": "L",
+      "nummernumerisk": "210",
+      "nummerpostfix": "",
+      "resume": "Med lovforslaget foresl\u00e5s det at \u00e6ndre de konkrete niveauer for udgiftslofter for staten for finans\u00e5rene 2025, 2026, 2027 og 2028. Forslaget f\u00f8lger af \u00bbAftale om styrkelse af Forsvarets kampkraft af 22. februar 2025\u00ab. \n\nLovforslaget foresl\u00e5s at tr\u00e6de i kraft den 23. juni 2025. ",
+      "afstemningskonklusion": "Vedtaget\nFor stemte 103 (S, V, DD, SF, LA, M, KF, DF, RV, ALT, Mike Villa Fonseca (UFG), Jeppe S\u00f8e (UFG)) \nimod stemte 1 (BP) \nhverken for eller imod stemte 6 (EL) ",
+      "periodeid": 163,
+      "afg\u00f8relsesresultatkode": null,
+      "baggrundsmateriale": null,
+      "opdateringsdato": "2025-07-25T12:34:14.217",
+      "statsbudgetsag": false,
+      "begrundelse": null,
+      "paragrafnummer": null,
+      "paragraf": null,
+      "afg\u00f8relsesdato": null,
+      "afg\u00f8relse": null,
+      "r\u00e5dsm\u00f8dedato": null,
+      "lovnummer": "713",
+      "lovnummerdato": "2025-06-20T00:00:00",
+      "retsinformationsurl": null,
+      "fremsatundersagid": null,
+      "deltundersagid": null
+    }
+  ]
+}

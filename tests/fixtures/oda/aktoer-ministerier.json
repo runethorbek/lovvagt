@@ -1,0 +1,83 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#Akt%C3%B8r",
+  "value": [
+    {
+      "id": 2,
+      "typeid": 1,
+      "gruppenavnkort": null,
+      "navn": "Finansministeriet",
+      "fornavn": null,
+      "efternavn": null,
+      "biografi": null,
+      "periodeid": null,
+      "opdateringsdato": "2026-06-03T09:58:04.287",
+      "startdato": "1953-09-30T00:00:00",
+      "slutdato": null
+    },
+    {
+      "id": 11,
+      "typeid": 1,
+      "gruppenavnkort": null,
+      "navn": "Forsvarsministeriet",
+      "fornavn": null,
+      "efternavn": null,
+      "biografi": null,
+      "periodeid": null,
+      "opdateringsdato": "2026-06-03T10:08:10.937",
+      "startdato": "1953-09-30T00:00:00",
+      "slutdato": null
+    },
+    {
+      "id": 204,
+      "typeid": 1,
+      "gruppenavnkort": null,
+      "navn": "Skatteministeriet",
+      "fornavn": null,
+      "efternavn": null,
+      "biografi": null,
+      "periodeid": null,
+      "opdateringsdato": "2026-08-25T16:35:34.667",
+      "startdato": "1987-09-10T00:00:00",
+      "slutdato": "2026-06-03T00:00:00"
+    },
+    {
+      "id": 254,
+      "typeid": 1,
+      "gruppenavnkort": null,
+      "navn": "Uddannelses- og Forskningsministeriet",
+      "fornavn": null,
+      "efternavn": null,
+      "biografi": null,
+      "periodeid": null,
+      "opdateringsdato": "2026-06-03T15:30:19.48",
+      "startdato": "2014-02-03T00:00:00",
+      "slutdato": "2026-06-03T00:00:00"
+    },
+    {
+      "id": 20977,
+      "typeid": 1,
+      "gruppenavnkort": null,
+      "navn": "Ministeriet for Samfundssikkerhed og Beredskab",
+      "fornavn": null,
+      "efternavn": null,
+      "biografi": null,
+      "periodeid": null,
+      "opdateringsdato": "2026-06-03T10:26:34.967",
+      "startdato": "2024-08-29T00:00:00",
+      "slutdato": null
+    },
+    {
+      "id": 20986,
+      "typeid": 1,
+      "gruppenavnkort": null,
+      "navn": "Digitaliseringsministeriet",
+      "fornavn": null,
+      "efternavn": null,
+      "biografi": null,
+      "periodeid": null,
+      "opdateringsdato": "2026-06-30T10:52:14.597",
+      "startdato": "2024-08-29T00:00:00",
+      "slutdato": "2026-06-03T00:00:00"
+    }
+  ]
+}

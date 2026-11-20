@@ -1,0 +1,36 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#Sag",
+  "value": [
+    {
+      "id": 69354,
+      "typeid": 3,
+      "kategoriid": 13,
+      "statusid": 11,
+      "titel": "Forslag til lov om foranstaltninger til sikring af et h\u00f8jt cybersikkerhedsniveau (NIS 2-loven).",
+      "titelkort": "Om foranstaltninger til sikring af et h\u00f8jt cybersikkerhedsniveau.",
+      "offentlighedskode": "O",
+      "nummer": "L 141",
+      "nummerprefix": "L",
+      "nummernumerisk": "141",
+      "nummerpostfix": "",
+      "resume": "Form\u00e5let med lovforslaget er at implementere Europa-Parlamentet og R\u00e5dets direktiv (EU) 2022/2555 af 14. december 2022 om foranstaltninger til sikring af et h\u00f8jt f\u00e6lles cybersikkerhedsniveau i hele Unionen, om \u00e6ndring af forordning (EU) nr. 910/2014 og direktiv (EU) 2018/1972 og om oph\u00e6velse af direktiv (EU) 2016/2259 (NIS 2-direktivet) for st\u00f8rstedelen af de sektorer, der er omfattet af NIS 2-direktiets anvendelsesomr\u00e5de, med undtagelse af tele-, energi- og finanssektorerne.\n\nMed lovforslaget l\u00e6gges der op til, at NIS 2-direktivet minimumimplementeres i overensstemmelse med regeringens principper for implementering af erhvervsrettet EU-regulering. Lovforslaget fasts\u00e6tter bl.a. krav om foranstaltninger til styring af cybersikkerhedsrisici, herunder f.eks. politikker for risikoanalyse, underretningspligter ved bl.a. v\u00e6sentlige h\u00e6ndelser og tilsyns- og h\u00e5ndh\u00e6velsesforanstaltninger.",
+      "afstemningskonklusion": "Vedtaget\nFor stemte 109 (S, V, DD, SF, LA, M, KF, EL, DF, RV, ALT, BP, Jon Stephensen (UFG), Mike Villa Fonseca (UFG)) \nimod stemte 0 \nhverken for eller imod stemte 0 ",
+      "periodeid": 163,
+      "afg\u00f8relsesresultatkode": null,
+      "baggrundsmateriale": null,
+      "opdateringsdato": "2025-05-07T09:41:29.257",
+      "statsbudgetsag": false,
+      "begrundelse": null,
+      "paragrafnummer": null,
+      "paragraf": null,
+      "afg\u00f8relsesdato": null,
+      "afg\u00f8relse": null,
+      "r\u00e5dsm\u00f8dedato": null,
+      "lovnummer": "434",
+      "lovnummerdato": "2025-05-06T00:00:00",
+      "retsinformationsurl": null,
+      "fremsatundersagid": null,
+      "deltundersagid": null
+    }
+  ]
+}

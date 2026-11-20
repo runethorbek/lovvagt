@@ -1,0 +1,29 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#EmneordSag",
+  "value": [
+    {
+      "Emneord": {
+        "id": 56153,
+        "typeid": 4,
+        "emneord": "Finansv\u00e6sen 20",
+        "opdateringsdato": "2026-11-12T10:08:14.07"
+      },
+      "id": 891606,
+      "emneordid": 56153,
+      "sagid": 101688,
+      "opdateringsdato": "2025-07-25T12:34:14.217"
+    },
+    {
+      "Emneord": {
+        "id": 33217,
+        "typeid": 1,
+        "emneord": "finanspolitik",
+        "opdateringsdato": "2026-11-19T15:17:11.23"
+      },
+      "id": 891607,
+      "emneordid": 33217,
+      "sagid": 101688,
+      "opdateringsdato": "2025-07-25T12:34:14.217"
+    }
+  ]
+}

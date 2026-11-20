@@ -1,0 +1,29 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#EmneordSag",
+  "value": [
+    {
+      "Emneord": {
+        "id": 33537,
+        "typeid": 4,
+        "emneord": "Undervisningsv\u00e6sen 48",
+        "opdateringsdato": "2026-11-10T17:19:02.207"
+      },
+      "id": 904207,
+      "emneordid": 33537,
+      "sagid": 101043,
+      "opdateringsdato": "2025-09-30T11:10:02.51"
+    },
+    {
+      "Emneord": {
+        "id": 33322,
+        "typeid": 1,
+        "emneord": "uddannelsesst\u00f8tte",
+        "opdateringsdato": "2026-11-19T15:41:02.277"
+      },
+      "id": 904208,
+      "emneordid": 33322,
+      "sagid": 101043,
+      "opdateringsdato": "2025-09-30T11:10:02.51"
+    }
+  ]
+}

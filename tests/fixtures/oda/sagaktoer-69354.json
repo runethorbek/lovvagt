@@ -1,0 +1,33 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#SagAkt%C3%B8r",
+  "value": [
+    {
+      "id": 1805519,
+      "akt\u00f8rid": 20978,
+      "sagid": 69354,
+      "opdateringsdato": "2025-05-07T09:41:29.257",
+      "rolleid": 14
+    },
+    {
+      "id": 1805520,
+      "akt\u00f8rid": 21041,
+      "sagid": 69354,
+      "opdateringsdato": "2025-05-07T09:41:29.257",
+      "rolleid": 11
+    },
+    {
+      "id": 1805521,
+      "akt\u00f8rid": 20977,
+      "sagid": 69354,
+      "opdateringsdato": "2025-05-07T09:41:29.257",
+      "rolleid": 6
+    },
+    {
+      "id": 1805522,
+      "akt\u00f8rid": 80,
+      "sagid": 69354,
+      "opdateringsdato": "2025-05-07T09:41:29.257",
+      "rolleid": 19
+    }
+  ]
+}
