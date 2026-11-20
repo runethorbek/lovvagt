@@ -1,0 +1,29 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#EmneordSag",
+  "value": [
+    {
+      "Emneord": {
+        "id": 33300,
+        "typeid": 4,
+        "emneord": "Retspleje 35",
+        "opdateringsdato": "2026-11-18T13:19:34.323"
+      },
+      "id": 865275,
+      "emneordid": 33300,
+      "sagid": 99215,
+      "opdateringsdato": "2024-12-11T08:37:20.907"
+    },
+    {
+      "Emneord": {
+        "id": 34063,
+        "typeid": 1,
+        "emneord": "klageinstanser og klagesager",
+        "opdateringsdato": "2026-11-18T17:08:22.037"
+      },
+      "id": 865276,
+      "emneordid": 34063,
+      "sagid": 99215,
+      "opdateringsdato": "2024-12-11T08:37:20.907"
+    }
+  ]
+}

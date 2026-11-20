@@ -1,0 +1,36 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#Sag",
+  "value": [
+    {
+      "id": 101403,
+      "typeid": 3,
+      "kategoriid": 13,
+      "statusid": 11,
+      "titel": "Forslag til lov om forsvarssamarbejde mellem Danmark og Amerikas Forenede Stater m.v.",
+      "titelkort": "Om forsvarssamarbejde mellem Danmark og Amerikas Forenede Stater m.v.",
+      "offentlighedskode": "O",
+      "nummer": "L 188",
+      "nummerprefix": "L",
+      "nummernumerisk": "188",
+      "nummerpostfix": "",
+      "resume": "Lovforslaget har til form\u00e5l at tilvejebringe det retlige grundlag for opfyldelse af aftale af 21. december 2023 om forsvarssamarbejde mellem Danmark og USA.\n\nForm\u00e5let med forsvarssamarbejdsaftalen er at styrke dansk, nordisk og europ\u00e6isk sikkerhed og at styrke NATO's muligheder for at agere i Danmarks n\u00e6romr\u00e5de.\n\nLovforslaget vil give de amerikanske styrker en direkte adkomst til g\u00f8re brug af udvalgte milit\u00e6re anl\u00e6g og omr\u00e5der i Danmark med henblik p\u00e5 at kunne foretage en r\u00e6kke konkrete aktiviteter som led i det milit\u00e6re samarbejde. Blandt disse aktiviteter er bl.a. udstationering af personel, opbevaring af milit\u00e6rt materiel og udstyr, vedligeholdelse, tr\u00e6ning m.v.",
+      "afstemningskonklusion": "Vedtaget\nFor stemte 95 (S, V, DD, SF, LA, M, KF, DF, RV, Jon Stephensen (UFG)) \nimod stemte 11 (EL, ALT, BP, Jeppe S\u00f8e (UFG), Theresa Scavenius (UFG)) \nhverken for eller imod stemte 1 ( Mike Villa Fonseca (UFG)) ",
+      "periodeid": 163,
+      "afg\u00f8relsesresultatkode": null,
+      "baggrundsmateriale": null,
+      "opdateringsdato": "2025-06-23T10:17:45.387",
+      "statsbudgetsag": false,
+      "begrundelse": null,
+      "paragrafnummer": null,
+      "paragraf": null,
+      "afg\u00f8relsesdato": null,
+      "afg\u00f8relse": null,
+      "r\u00e5dsm\u00f8dedato": null,
+      "lovnummer": "698",
+      "lovnummerdato": "2025-06-20T00:00:00",
+      "retsinformationsurl": null,
+      "fremsatundersagid": null,
+      "deltundersagid": null
+    }
+  ]
+}

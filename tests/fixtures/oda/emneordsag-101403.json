@@ -1,0 +1,29 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#EmneordSag",
+  "value": [
+    {
+      "Emneord": {
+        "id": 33299,
+        "typeid": 4,
+        "emneord": "Folkeretlige forhold 52",
+        "opdateringsdato": "2026-11-19T10:02:29.447"
+      },
+      "id": 889265,
+      "emneordid": 33299,
+      "sagid": 101403,
+      "opdateringsdato": "2025-06-23T10:17:45.387"
+    },
+    {
+      "Emneord": {
+        "id": 34170,
+        "typeid": 1,
+        "emneord": "NATO",
+        "opdateringsdato": "2026-11-20T10:12:42.06"
+      },
+      "id": 889266,
+      "emneordid": 34170,
+      "sagid": 101403,
+      "opdateringsdato": "2025-06-23T10:17:45.387"
+    }
+  ]
+}

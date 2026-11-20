@@ -1,0 +1,36 @@
+{
+  "odata.metadata": "https://oda.ft.dk/api/$metadata#Sag",
+  "value": [
+    {
+      "id": 99215,
+      "typeid": 3,
+      "kategoriid": 13,
+      "statusid": 11,
+      "titel": "Forslag til lov om forsvarerbistand og aktindsigt i administrative straffesager p\u00e5 skatteomr\u00e5det (skattestraffesagsloven).",
+      "titelkort": "Om forsvarerbistand og aktindsigt i administrative straffesager p\u00e5 skatteomr\u00e5det. ",
+      "offentlighedskode": "O",
+      "nummer": "L 31",
+      "nummerprefix": "L",
+      "nummernumerisk": "31",
+      "nummerpostfix": "",
+      "resume": "Form\u00e5let med lovforslaget er at styrke borgere og virksomheders retstilling under Skatteforvaltningens behandling af en administrativ b\u00f8desag.\n\nDet foresl\u00e5s, at en overtr\u00e6delse af toldlovgivningen ikke l\u00e6ngere generelt vil skulle v\u00e6re undtaget muligheden for, at der kan ske beskikkelse af en forsvarer til den, der er sigtet i en administrativ straffesag, som behandles af Skatteforvaltningen.\n\nDet foresl\u00e5s desuden, at en sigtet, som ikke har en forsvarer, selv sikres en ret til at kunne f\u00e5 aktindsigt i straffesagens materiale.\n\nEndelig foresl\u00e5s det, at ikke kun en borger, men ogs\u00e5 en juridisk person skal kunne f\u00e5 beskikket en forsvarer.\n\nDet foresl\u00e5s, at loven skal tr\u00e6de i kraft den 1. januar 2025.",
+      "afstemningskonklusion": "Vedtaget\nFor stemte 108 (S, V, DD, SF, LA, M, KF, EL, RV, DF, ALT, UFG,) \nimod stemte 1 ( Lars Boje Mathiesen (UFG))\nhverken for eller imod stemte 0 () ",
+      "periodeid": 163,
+      "afg\u00f8relsesresultatkode": null,
+      "baggrundsmateriale": null,
+      "opdateringsdato": "2024-12-11T08:37:20.907",
+      "statsbudgetsag": false,
+      "begrundelse": null,
+      "paragrafnummer": null,
+      "paragraf": null,
+      "afg\u00f8relsesdato": null,
+      "afg\u00f8relse": null,
+      "r\u00e5dsm\u00f8dedato": null,
+      "lovnummer": "1454",
+      "lovnummerdato": "2024-12-10T00:00:00",
+      "retsinformationsurl": null,
+      "fremsatundersagid": null,
+      "deltundersagid": null
+    }
+  ]
+}
