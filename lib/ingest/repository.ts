@@ -18,13 +18,19 @@
  */
 import type { SqlExecutor } from "@/lib/db";
 import type {
+  Afstemning,
   Aktoer,
+  Dokument,
   Emneord,
   EmneordSag,
+  Fil,
   OdaRaw,
   Periode,
   Sag,
   SagAktoer,
+  SagDokument,
+  Sagstrin,
+  Stemme,
 } from "@/lib/oda";
 import type { MatchedRule, Topic } from "@/lib/ingest/topics";
 
@@ -110,6 +116,84 @@ const emneordSagColumns = [
   ["id", "integer"],
   ["emneordid", "integer"],
   ["sagid", "integer"],
+  ["opdateringsdato", "timestamptz"],
+  ["raw", "jsonb"],
+] as const satisfies readonly Column[];
+
+const sagstrinColumns = [
+  ["id", "integer"],
+  ["sagid", "integer"],
+  ["typeid", "integer"],
+  ["type", "text"],
+  ["statusid", "integer"],
+  ["titel", "text"],
+  ["dato", "timestamptz"],
+  ["folketingstidende", "text"],
+  ["folketingstidendeurl", "text"],
+  ["folketingstidendesidenummer", "text"],
+  ["opdateringsdato", "timestamptz"],
+  ["raw", "jsonb"],
+] as const satisfies readonly Column[];
+
+const afstemningColumns = [
+  ["id", "integer"],
+  ["sagstrinid", "integer"],
+  ["nummer", "integer"],
+  ["typeid", "integer"],
+  ["vedtaget", "boolean"],
+  ["konklusion", "text"],
+  ["kommentar", "text"],
+  ["moedeid", "integer"],
+  ["opdateringsdato", "timestamptz"],
+  ["raw", "jsonb"],
+] as const satisfies readonly Column[];
+
+const stemmeColumns = [
+  ["id", "integer"],
+  ["afstemningid", "integer"],
+  ["aktoerid", "integer"],
+  ["typeid", "integer"],
+  ["type", "text"],
+  ["opdateringsdato", "timestamptz"],
+  ["raw", "jsonb"],
+] as const satisfies readonly Column[];
+
+const dokumentColumns = [
+  ["id", "integer"],
+  ["typeid", "integer"],
+  ["type", "text"],
+  ["kategoriid", "integer"],
+  ["statusid", "integer"],
+  ["titel", "text"],
+  ["dato", "timestamptz"],
+  ["modtagelsesdato", "timestamptz"],
+  ["frigivelsesdato", "timestamptz"],
+  ["offentlighedskode", "text"],
+  ["procedurenummer", "text"],
+  ["opdateringsdato", "timestamptz"],
+  ["raw", "jsonb"],
+] as const satisfies readonly Column[];
+
+const sagDokumentColumns = [
+  ["id", "integer"],
+  ["sagid", "integer"],
+  ["dokumentid", "integer"],
+  ["rolleid", "integer"],
+  ["rolle", "text"],
+  ["bilagsnummer", "text"],
+  ["frigivelsesdato", "timestamptz"],
+  ["opdateringsdato", "timestamptz"],
+  ["raw", "jsonb"],
+] as const satisfies readonly Column[];
+
+const filColumns = [
+  ["id", "integer"],
+  ["dokumentid", "integer"],
+  ["titel", "text"],
+  ["versionsdato", "timestamptz"],
+  ["filurl", "text"],
+  ["format", "text"],
+  ["variantkode", "text"],
   ["opdateringsdato", "timestamptz"],
   ["raw", "jsonb"],
 ] as const satisfies readonly Column[];
@@ -220,51 +304,174 @@ export async function upsertSag(
   return upsertMirror(sql, "sag", sagColumns, rows);
 }
 
+/** Upserts Aktør rows. `writtenIds` lists the rows inserted or updated. */
 export async function upsertAktoer(
   sql: SqlExecutor,
   rows: readonly Aktoer[],
-): Promise<UpsertCounts> {
-  return countsOf(await upsertMirror(sql, "aktoer", aktoerColumns, rows));
+): Promise<UpsertCounts & { writtenIds: number[] }> {
+  return upsertMirror(sql, "aktoer", aktoerColumns, rows);
 }
 
-/** Upserts SagAktør rows; `raw` is stored without `SagAktørRolle`/`Aktør`. */
+/**
+ * Upserts SagAktør rows; `raw` is stored without `SagAktørRolle`/`Aktør`.
+ * `writtenIds` lists the rows inserted or updated.
+ */
 export async function upsertSagAktoer(
   sql: SqlExecutor,
   rows: readonly SagAktoer[],
+): Promise<UpsertCounts & { writtenIds: number[] }> {
+  return upsertMirror(
+    sql,
+    "sag_aktoer",
+    sagAktoerColumns,
+    rows.map((row) => ({
+      ...row,
+      raw: withoutNavigation(row.raw, ["SagAktørRolle", "Aktør", "Sag"]),
+    })),
+  );
+}
+
+/** Upserts Emneord rows. `writtenIds` lists the rows inserted or updated. */
+export async function upsertEmneord(
+  sql: SqlExecutor,
+  rows: readonly Emneord[],
+): Promise<UpsertCounts & { writtenIds: number[] }> {
+  return upsertMirror(sql, "emneord", emneordColumns, rows);
+}
+
+/**
+ * Upserts EmneordSag rows; `raw` is stored without `Emneord`/`Sag`.
+ * `writtenIds` lists the rows inserted or updated.
+ */
+export async function upsertEmneordSag(
+  sql: SqlExecutor,
+  rows: readonly EmneordSag[],
+): Promise<UpsertCounts & { writtenIds: number[] }> {
+  return upsertMirror(
+    sql,
+    "emneord_sag",
+    emneordSagColumns,
+    rows.map((row) => ({
+      ...row,
+      raw: withoutNavigation(row.raw, ["Emneord", "Sag"]),
+    })),
+  );
+}
+
+/** Upserts stages; `raw` is stored without `Sagstrinstype`/`Sag`. */
+export async function upsertSagstrin(
+  sql: SqlExecutor,
+  rows: readonly Sagstrin[],
 ): Promise<UpsertCounts> {
   return countsOf(
     await upsertMirror(
       sql,
-      "sag_aktoer",
-      sagAktoerColumns,
+      "sagstrin",
+      sagstrinColumns,
       rows.map((row) => ({
         ...row,
-        raw: withoutNavigation(row.raw, ["SagAktørRolle", "Aktør", "Sag"]),
+        raw: withoutNavigation(row.raw, ["Sagstrinstype", "Sag"]),
       })),
     ),
   );
 }
 
-export async function upsertEmneord(
+/** Upserts votes. */
+export async function upsertAfstemning(
   sql: SqlExecutor,
-  rows: readonly Emneord[],
-): Promise<UpsertCounts> {
-  return countsOf(await upsertMirror(sql, "emneord", emneordColumns, rows));
-}
-
-/** Upserts EmneordSag rows; `raw` is stored without `Emneord`/`Sag`. */
-export async function upsertEmneordSag(
-  sql: SqlExecutor,
-  rows: readonly EmneordSag[],
+  rows: readonly Afstemning[],
 ): Promise<UpsertCounts> {
   return countsOf(
     await upsertMirror(
       sql,
-      "emneord_sag",
-      emneordSagColumns,
+      "afstemning",
+      afstemningColumns,
       rows.map((row) => ({
         ...row,
-        raw: withoutNavigation(row.raw, ["Emneord", "Sag"]),
+        raw: withoutNavigation(row.raw, ["Sagstrin"]),
+      })),
+    ),
+  );
+}
+
+/** Upserts individual votes; `raw` is stored without `Stemmetype`. */
+export async function upsertStemme(
+  sql: SqlExecutor,
+  rows: readonly Stemme[],
+): Promise<UpsertCounts> {
+  return countsOf(
+    await upsertMirror(
+      sql,
+      "stemme",
+      stemmeColumns,
+      rows.map((row) => ({
+        ...row,
+        raw: withoutNavigation(row.raw, ["Stemmetype", "Afstemning", "Aktør"]),
+      })),
+    ),
+  );
+}
+
+/**
+ * Upserts documents; `raw` is stored without `Dokumenttype`/`Fil`. Expanded
+ * files are not stored here: pass them to `upsertFil`.
+ */
+export async function upsertDokument(
+  sql: SqlExecutor,
+  rows: readonly Dokument[],
+): Promise<UpsertCounts> {
+  return countsOf(
+    await upsertMirror(
+      sql,
+      "dokument",
+      dokumentColumns,
+      rows.map((row) => ({
+        ...row,
+        raw: withoutNavigation(row.raw, ["Dokumenttype", "Fil"]),
+      })),
+    ),
+  );
+}
+
+/**
+ * Upserts SagDokument rows; `raw` is stored without `SagDokumentRolle`,
+ * `Dokument` and `Sag`. An expanded document is not stored here: pass it to
+ * `upsertDokument`.
+ */
+export async function upsertSagDokument(
+  sql: SqlExecutor,
+  rows: readonly SagDokument[],
+): Promise<UpsertCounts> {
+  return countsOf(
+    await upsertMirror(
+      sql,
+      "sag_dokument",
+      sagDokumentColumns,
+      rows.map((row) => ({
+        ...row,
+        raw: withoutNavigation(row.raw, [
+          "SagDokumentRolle",
+          "Dokument",
+          "Sag",
+        ]),
+      })),
+    ),
+  );
+}
+
+/** Upserts files (metadata only; the bytes go to Blob in a later step). */
+export async function upsertFil(
+  sql: SqlExecutor,
+  rows: readonly Fil[],
+): Promise<UpsertCounts> {
+  return countsOf(
+    await upsertMirror(
+      sql,
+      "fil",
+      filColumns,
+      rows.map((row) => ({
+        ...row,
+        raw: withoutNavigation(row.raw, ["Dokument"]),
       })),
     ),
   );
@@ -344,18 +551,111 @@ export async function upsertTrackedSag(
   return readCounts(result);
 }
 
+/** ODA mirror tables keyed by `id`. */
+export type MirrorTable =
+  "sag" | "sagstrin" | "afstemning" | "aktoer" | "dokument" | "emneord";
+
+/** The ids among `ids` that are stored in `table`. */
+export async function storedIds(
+  sql: SqlExecutor,
+  table: MirrorTable,
+  ids: readonly number[],
+): Promise<Set<number>> {
+  if (ids.length === 0) return new Set();
+  const rows = await sql.query(
+    `SELECT id FROM ${table}
+     WHERE id IN (SELECT jsonb_array_elements_text($1::jsonb)::integer)`,
+    [JSON.stringify([...new Set(ids)])],
+  );
+  return new Set(rows.map((row) => Number(row.id)));
+}
+
 /** The ids among `sagIds` that are stored in `sag` (tracked bills). */
 export async function storedSagIds(
   sql: SqlExecutor,
   sagIds: readonly number[],
 ): Promise<Set<number>> {
-  if (sagIds.length === 0) return new Set();
+  return storedIds(sql, "sag", sagIds);
+}
+
+/** The stored `opdateringsdato` of the given ids in `table`, by id. */
+export async function storedOpdateringsdato(
+  sql: SqlExecutor,
+  table: MirrorTable,
+  ids: readonly number[],
+): Promise<Map<number, Date>> {
+  if (ids.length === 0) return new Map();
   const rows = await sql.query(
-    `SELECT id FROM sag
+    `SELECT id, opdateringsdato FROM ${table}
      WHERE id IN (SELECT jsonb_array_elements_text($1::jsonb)::integer)`,
-    [JSON.stringify(sagIds)],
+    [JSON.stringify([...new Set(ids)])],
   );
-  return new Set(rows.map((row) => Number(row.id)));
+  return new Map(
+    rows.map((row) => [Number(row.id), new Date(row.opdateringsdato as Date)]),
+  );
+}
+
+/**
+ * Stored bills that were first tracked at or after `since`: bills with no
+ * `tracked_sag` row first matched before it (all stored bills when `since`
+ * is null). In id order, after `afterId`, at most `limit`.
+ */
+export async function sagIdsTrackedSince(
+  sql: SqlExecutor,
+  since: Date | null,
+  afterId: number,
+  limit: number,
+): Promise<number[]> {
+  const rows = await sql.query(
+    `SELECT s.id FROM sag s
+     WHERE s.id > $2
+       AND ($1::timestamptz IS NULL OR NOT EXISTS (
+         SELECT 1 FROM tracked_sag t
+         WHERE t.sag_id = s.id AND t.first_matched_at < $1::timestamptz
+       ))
+     ORDER BY s.id
+     LIMIT $3`,
+    [since?.toISOString() ?? null, afterId, limit],
+  );
+  return rows.map((row) => Number(row.id));
+}
+
+/** Stored bills whose ministry (SagAktør role 6) is one of `aktoerIds`. */
+export async function sagIdsWithMinistry(
+  sql: SqlExecutor,
+  aktoerIds: readonly number[],
+  ministryRolleId: number,
+): Promise<number[]> {
+  if (aktoerIds.length === 0) return [];
+  const rows = await sql.query(
+    `SELECT DISTINCT sa.sagid FROM sag_aktoer sa JOIN sag s ON s.id = sa.sagid
+     WHERE sa.rolleid = $2
+       AND sa.aktoerid IN (SELECT jsonb_array_elements_text($1::jsonb)::integer)
+     ORDER BY sa.sagid`,
+    [JSON.stringify(aktoerIds), ministryRolleId],
+  );
+  return rows.map((row) => Number(row.sagid));
+}
+
+/** Stored bills linked to one of `emneordIds` by a stored EmneordSag row. */
+export async function sagIdsWithEmneord(
+  sql: SqlExecutor,
+  emneordIds: readonly number[],
+): Promise<number[]> {
+  if (emneordIds.length === 0) return [];
+  const rows = await sql.query(
+    `SELECT DISTINCT es.sagid FROM emneord_sag es JOIN sag s ON s.id = es.sagid
+     WHERE es.emneordid IN (SELECT jsonb_array_elements_text($1::jsonb)::integer)
+     ORDER BY es.sagid`,
+    [JSON.stringify(emneordIds)],
+  );
+  return rows.map((row) => Number(row.sagid));
+}
+
+/** The database clock, so `tracked_sag.first_matched_at` can be compared. */
+export async function databaseNow(sql: SqlExecutor): Promise<Date> {
+  const [row] = await sql.query("SELECT now() AS now");
+  return new Date(row?.now as Date);
 }
 
 /**
@@ -375,8 +675,27 @@ export async function sessionIdsFrom(
   return rows.map((row) => Number(row.id));
 }
 
-/** Entities with a watermark in `ingest_run.watermarks`. */
-export type WatermarkEntity = "sag";
+/**
+ * Entities with a watermark in `ingest_run.watermarks`. Each is the highest
+ * ODA `opdateringsdato` handled for that entity, except `tracked_sag`: the
+ * database time at which the children step last started (bills first tracked
+ * at or after it still need all their children).
+ */
+export const watermarkEntities = [
+  "sag",
+  "sag_aktoer",
+  "emneord_sag",
+  "aktoer",
+  "emneord",
+  "tracked_sag",
+  "sagstrin",
+  "afstemning",
+  "sag_dokument",
+  "dokument",
+  "fil",
+] as const;
+
+export type WatermarkEntity = (typeof watermarkEntities)[number];
 
 /**
  * The latest stored watermark for an entity: the value in the most recent
@@ -414,4 +733,57 @@ export async function writeWatermark(
      WHERE id = $1`,
     [runId, entity, watermark.toISOString()],
   );
+}
+
+/**
+ * The latest stored watermark of every entity that has one, like
+ * `readWatermark` for each.
+ */
+export async function readWatermarks(
+  sql: SqlExecutor,
+): Promise<Partial<Record<WatermarkEntity, Date>>> {
+  const rows = await sql.query(
+    `SELECT DISTINCT ON (w.key) w.key, w.value
+     FROM ingest_run r, jsonb_each_text(r.watermarks) AS w(key, value)
+     ORDER BY w.key, r.id DESC`,
+  );
+  const result: Partial<Record<WatermarkEntity, Date>> = {};
+  for (const row of rows) {
+    const entity = watermarkEntities.find((name) => name === row.key);
+    const date = new Date(String(row.value));
+    if (entity !== undefined && !Number.isNaN(date.getTime()))
+      result[entity] = date;
+  }
+  return result;
+}
+
+/**
+ * Records a completed run with its counts and watermarks, for callers that
+ * run the steps without a lease (the local script). Returns the run id.
+ */
+export async function recordCompletedRun(
+  sql: SqlExecutor,
+  startedAt: Date,
+  counts: Record<string, unknown>,
+  watermarks: Partial<Record<WatermarkEntity, Date>>,
+): Promise<number> {
+  const [row] = await sql.query(
+    `INSERT INTO ingest_run
+       (status, started_at, finished_at, lease_expires_at, counts, watermarks)
+     VALUES ('completed', $1::timestamptz, now(), now(), $2::jsonb, $3::jsonb)
+     RETURNING id`,
+    [
+      startedAt.toISOString(),
+      JSON.stringify(counts),
+      JSON.stringify(
+        Object.fromEntries(
+          Object.entries(watermarks).map(([entity, date]) => [
+            entity,
+            date.toISOString(),
+          ]),
+        ),
+      ),
+    ],
+  );
+  return Number(row?.id);
 }

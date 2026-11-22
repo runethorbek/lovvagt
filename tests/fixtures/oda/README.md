@@ -6,7 +6,10 @@ the topic rule tests (`tests/unit/topics.test.ts`) and the ingest tests
 (`tests/unit/ingest-*.test.ts`). Tests never call ODA; they serve these files
 through a mocked `fetch`. The ingest step tests compose recorded rows into
 responses (e.g. SagAktør rows with their `SagAktørRolle` row nested, as
-`$expand=SagAktørRolle` returns them) without changing field values.
+`$expand=SagAktørRolle` returns them, or the recorded `SagDokument` rows with
+`Dokument/Fil` split into SagDokument, Dokument and Fil rows). Tests that
+need a change in ODA (a later `opdateringsdato`, a changed name or link)
+make it in test code, marked with a comment, and never in these files.
 
 The files are trimmed to keep them small. Field values are never changed:
 

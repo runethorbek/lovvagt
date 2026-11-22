@@ -1,24 +1,41 @@
 /**
  * Ingest repository (spec 002, deliverables 1 and 4) on the SQL test
  * harness: inserts, updates on changed records, no write on unchanged
- * records, `tracked_sag` evaluations and watermarks.
+ * records (for bills, links and every child table), `tracked_sag`
+ * evaluations, the lookups the steps use, and watermarks.
  */
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import {
+  databaseNow,
   readWatermark,
+  readWatermarks,
+  recordCompletedRun,
+  sagIdsTrackedSince,
+  sagIdsWithEmneord,
+  sagIdsWithMinistry,
   sessionIdsFrom,
+  storedIds,
+  storedOpdateringsdato,
   storedSagIds,
+  upsertAfstemning,
   upsertAktoer,
+  upsertDokument,
   upsertEmneord,
   upsertEmneordSag,
+  upsertFil,
   upsertPeriode,
   upsertSag,
   upsertSagAktoer,
+  upsertSagDokument,
+  upsertSagstrin,
+  upsertStemme,
   upsertTrackedSag,
   writeWatermark,
   type TrackedSagRow,
+  type UpsertCounts,
 } from "@/lib/ingest/repository";
 import { odaParsers, type Sag } from "@/lib/oda";
+import type { SqlExecutor } from "@/lib/db";
 import { odaFixture } from "@/tests/support/oda";
 import {
   createMigratedTestDatabase,
@@ -37,7 +54,9 @@ afterAll(async () => {
 
 beforeEach(async () => {
   await database.pg.exec(
-    "TRUNCATE tracked_sag, sag, periode, aktoer, sag_aktoer, emneord, emneord_sag, ingest_run",
+    `TRUNCATE tracked_sag, sag, periode, aktoer, sag_aktoer, emneord,
+       emneord_sag, ingest_run, sagstrin, afstemning, stemme, dokument,
+       sag_dokument, fil, fil_blob`,
   );
 });
 
@@ -165,11 +184,13 @@ describe("mirror tables", () => {
       inserted: 4,
       updated: 0,
       unchanged: 0,
+      writtenIds: [8, 11, 206, 21041],
     });
     expect(await upsertEmneord(database.sql, emneord)).toEqual({
       inserted: 1,
       updated: 0,
       unchanged: 0,
+      writtenIds: [33142],
     });
     const before = [
       ...(await versions("periode")),
@@ -210,6 +231,7 @@ describe("mirror tables", () => {
       inserted: 4,
       updated: 0,
       unchanged: 0,
+      writtenIds: [1822261, 1822262, 1822263, 1822264],
     });
     const [row] = await database.sql.query(
       "SELECT rolle, raw FROM sag_aktoer WHERE rolleid = 6",
@@ -226,6 +248,7 @@ describe("mirror tables", () => {
       inserted: 0,
       updated: 1,
       unchanged: 3,
+      writtenIds: [1822263],
     });
   });
 
@@ -236,6 +259,7 @@ describe("mirror tables", () => {
       inserted: 2,
       updated: 0,
       unchanged: 0,
+      writtenIds: [891608, 891609],
     });
     const stored = await database.sql.query("SELECT raw FROM emneord_sag");
     for (const row of stored) expect(row.raw).not.toHaveProperty("Emneord");
@@ -249,7 +273,250 @@ describe("mirror tables", () => {
       inserted: 0,
       updated: 0,
       unchanged: 2,
+      writtenIds: [],
     });
+  });
+});
+
+/** Lookup rows by id, for composing expanded rows as ODA returns them. */
+function lookup(name: string): Map<unknown, Record<string, unknown>> {
+  return new Map(odaFixture(name).value.map((row) => [row.id, row]));
+}
+
+const sagDokumentRoller = lookup("sagdokumentrolle");
+const dokumenttyper = lookup("dokumenttype");
+const stemmetyper = lookup("stemmetype");
+
+// Recorded SagDokument rows of L 211 with `Dokument/Fil` expanded.
+const l211SagDokument = () => odaFixture("sagdokument-101687").value;
+
+/** Each child table: rows from fixtures, as the children step fetches them. */
+const childTables: {
+  table: string;
+  rows: () => { id: number; opdateringsdato: Date; raw: object }[];
+  upsert: (
+    sql: SqlExecutor,
+    rows: never[],
+  ) => Promise<UpsertCounts & { writtenIds?: number[] }>;
+  /** A typed column and its expected value for the first row. */
+  column: [name: string, value: unknown];
+  /** Navigation properties that must not be stored in `raw`. */
+  navigation: string[];
+}[] = [
+  {
+    table: "sagstrin",
+    // Recorded with `$expand=Sagstrinstype`.
+    rows: () => rows("sagstrin-101687", odaParsers.Sagstrin),
+    upsert: upsertSagstrin,
+    column: ["type", "Fremsættelse"],
+    navigation: ["Sagstrinstype"],
+  },
+  {
+    table: "afstemning",
+    rows: () => rows("afstemning-101039", odaParsers.Afstemning),
+    upsert: upsertAfstemning,
+    column: ["moedeid", 14624],
+    navigation: [],
+  },
+  {
+    table: "stemme",
+    // As fetched with `$expand=Stemmetype`.
+    rows: () =>
+      ["stemme-10204-p1", "stemme-10204-p2"].flatMap((name) =>
+        odaFixture(name).value.map((row) => {
+          const parsed = odaParsers.Stemme({
+            ...row,
+            Stemmetype: stemmetyper.get(row.typeid),
+          });
+          if (parsed === undefined) throw new Error("invalid Stemme");
+          return parsed;
+        }),
+      ),
+    upsert: upsertStemme,
+    column: ["aktoerid", 18713],
+    navigation: ["Stemmetype"],
+  },
+  {
+    table: "dokument",
+    // As fetched with `$expand=Dokumenttype,Fil`.
+    rows: () =>
+      l211SagDokument().map((row) => {
+        const dokument = row.Dokument as Record<string, unknown>;
+        const parsed = odaParsers.Dokument({
+          ...dokument,
+          Dokumenttype: dokumenttyper.get(dokument.typeid),
+        });
+        if (parsed === undefined) throw new Error("invalid Dokument");
+        return parsed;
+      }),
+    upsert: upsertDokument,
+    column: ["type", "Forslagstekst"],
+    navigation: ["Dokumenttype", "Fil"],
+  },
+  {
+    table: "sag_dokument",
+    // As fetched with `$expand=SagDokumentRolle` (recorded with Dokument/Fil).
+    rows: () =>
+      l211SagDokument().map((row) => {
+        const parsed = odaParsers.SagDokument({
+          ...row,
+          SagDokumentRolle: sagDokumentRoller.get(row.rolleid),
+        });
+        if (parsed === undefined) throw new Error("invalid SagDokument");
+        return parsed;
+      }),
+    upsert: upsertSagDokument,
+    column: ["rolle", "På sagstrin"],
+    navigation: ["SagDokumentRolle", "Dokument"],
+  },
+  {
+    table: "fil",
+    rows: () =>
+      l211SagDokument().flatMap((row) =>
+        ((row.Dokument as { Fil: unknown[] }).Fil ?? []).map((fil) => {
+          const parsed = odaParsers.Fil(fil);
+          if (parsed === undefined) throw new Error("invalid Fil");
+          return parsed;
+        }),
+      ),
+    upsert: upsertFil,
+    column: ["format", "PDF"],
+    navigation: [],
+  },
+];
+
+describe.each(childTables)(
+  "$table",
+  ({ table, rows: childRows, upsert, column, navigation }) => {
+    const write = (batch: { id: number }[]) =>
+      upsert(database.sql, batch as never[]);
+
+    it("inserts rows with typed columns and raw without expansions", async () => {
+      const batch = childRows();
+      expect(await write(batch)).toMatchObject({
+        inserted: batch.length,
+        updated: 0,
+        unchanged: 0,
+      });
+      const [first] = await database.sql.query(
+        `SELECT ${column[0]} AS value, raw FROM ${table} WHERE id = $1`,
+        [batch[0].id],
+      );
+      expect(first.value).toBe(column[1]);
+      for (const property of navigation)
+        expect(first.raw).not.toHaveProperty(property);
+      expect(first.raw).toHaveProperty("opdateringsdato");
+    });
+
+    it("writes nothing when the rows are unchanged", async () => {
+      const batch = childRows();
+      await write(batch);
+      const before = await versions(table);
+      expect(await write(childRows())).toMatchObject({
+        inserted: 0,
+        updated: 0,
+        unchanged: batch.length,
+      });
+      expect(await versions(table)).toEqual(before);
+    });
+
+    it("updates a row with a changed opdateringsdato", async () => {
+      const batch = childRows();
+      await write(batch);
+      // Changed in test code: a later opdateringsdato on the first row.
+      const changed = [
+        { ...batch[0], opdateringsdato: new Date("2026-11-21T10:00:00.000Z") },
+        ...batch.slice(1),
+      ];
+      expect(await write(changed)).toMatchObject({
+        inserted: 0,
+        updated: 1,
+        unchanged: batch.length - 1,
+      });
+      const [row] = await database.sql.query(
+        `SELECT opdateringsdato FROM ${table} WHERE id = $1`,
+        [batch[0].id],
+      );
+      expect((row.opdateringsdato as Date).toISOString()).toBe(
+        "2026-11-21T10:00:00.000Z",
+      );
+    });
+  },
+);
+
+describe("lookups for the steps", () => {
+  it("finds stored ids and their opdateringsdato", async () => {
+    await upsertSagstrin(
+      database.sql,
+      rows("sagstrin-101687", odaParsers.Sagstrin),
+    );
+    expect(
+      await storedIds(database.sql, "sagstrin", [265468, 1, 265468]),
+    ).toEqual(new Set([265468]));
+    expect(await storedIds(database.sql, "sagstrin", [])).toEqual(new Set());
+    const dates = await storedOpdateringsdato(
+      database.sql,
+      "sagstrin",
+      [265468, 2],
+    );
+    expect([...dates.keys()]).toEqual([265468]);
+    expect(dates.get(265468)?.toISOString()).toBe("2025-04-23T16:03:52.060Z");
+  });
+
+  it("finds stored bills by ministry and by Emneord", async () => {
+    await upsertSag(database.sql, [l211()]);
+    await upsertSagAktoer(
+      database.sql,
+      rows("sagaktoer-101687", odaParsers.SagAktør),
+    );
+    await upsertEmneordSag(
+      database.sql,
+      rows("emneordsag-101687", odaParsers.EmneordSag),
+    );
+    // Aktør 11 is L 211's ministry (role 6); Aktør 8 has role 14.
+    expect(await sagIdsWithMinistry(database.sql, [11], 6)).toEqual([101687]);
+    expect(await sagIdsWithMinistry(database.sql, [8], 6)).toEqual([]);
+    expect(await sagIdsWithEmneord(database.sql, [33142])).toEqual([101687]);
+    expect(await sagIdsWithEmneord(database.sql, [1])).toEqual([]);
+  });
+
+  it("finds bills first tracked at or after a time", async () => {
+    await upsertSag(database.sql, [
+      l211(),
+      ...rows("sag-101039", odaParsers.Sag),
+    ]);
+    await upsertTrackedSag(database.sql, [
+      { sagId: 101039, topic: "ai", matching: true, matchedRules: [] },
+      { sagId: 101687, topic: "defence", matching: true, matchedRules: [] },
+    ]);
+    await database.pg.exec(
+      `UPDATE tracked_sag SET first_matched_at = '2026-01-01T00:00:00Z'
+       WHERE sag_id = 101039`,
+    );
+    const since = new Date("2026-06-01T00:00:00Z");
+    expect(await sagIdsTrackedSince(database.sql, since, 0, 10)).toEqual([
+      101687,
+    ]);
+    expect(await sagIdsTrackedSince(database.sql, null, 0, 10)).toEqual([
+      101039, 101687,
+    ]);
+    expect(await sagIdsTrackedSince(database.sql, null, 101039, 10)).toEqual([
+      101687,
+    ]);
+    expect(await sagIdsTrackedSince(database.sql, null, 0, 1)).toEqual([
+      101039,
+    ]);
+    // A stored bill without any tracked_sag row counts as new.
+    await database.pg.exec("DELETE FROM tracked_sag WHERE sag_id = 101039");
+    expect(await sagIdsTrackedSince(database.sql, since, 0, 10)).toEqual([
+      101039, 101687,
+    ]);
+  });
+
+  it("reads the database clock", async () => {
+    const before = Date.now();
+    const now = await databaseNow(database.sql);
+    expect(Math.abs(now.getTime() - before)).toBeLessThan(60_000);
   });
 });
 
@@ -432,6 +699,51 @@ describe("watermarks", () => {
     );
     expect((await readWatermark(database.sql, "sag"))?.toISOString()).toBe(
       "2025-09-30T09:10:02.510Z",
+    );
+  });
+
+  it("reads the latest watermark of every entity at once", async () => {
+    const first = await run();
+    await writeWatermark(database.sql, first, "sag", new Date(1000));
+    await writeWatermark(database.sql, first, "fil", new Date(2000));
+    const second = await run();
+    await writeWatermark(database.sql, second, "sag", new Date(3000));
+    await database.sql.query(
+      `UPDATE ingest_run SET watermarks = watermarks || '{"unknown": "x"}'
+       WHERE id = $1`,
+      [second],
+    );
+    expect(await readWatermarks(database.sql)).toEqual({
+      sag: new Date(3000),
+      fil: new Date(2000),
+    });
+  });
+
+  it("records a completed run with counts and watermarks", async () => {
+    const id = await recordCompletedRun(
+      database.sql,
+      new Date("2026-11-22T10:00:00.000Z"),
+      { bills: { sag: { fetched: 1 } } },
+      { sag: new Date(1000), tracked_sag: new Date(2000) },
+    );
+    const [row] = await database.sql.query(
+      "SELECT status, started_at, finished_at, counts, watermarks FROM ingest_run WHERE id = $1",
+      [id],
+    );
+    expect(row).toMatchObject({
+      status: "completed",
+      counts: { bills: { sag: { fetched: 1 } } },
+      watermarks: {
+        sag: "1970-01-01T00:00:01.000Z",
+        tracked_sag: "1970-01-01T00:00:02.000Z",
+      },
+    });
+    expect((row.started_at as Date).toISOString()).toBe(
+      "2026-11-22T10:00:00.000Z",
+    );
+    expect(row.finished_at).not.toBeNull();
+    expect((await readWatermarks(database.sql)).tracked_sag).toEqual(
+      new Date(2000),
     );
   });
 
