@@ -661,8 +661,12 @@ export type LinksOptions = StepOptions & {
   since?: Partial<Record<LinksEntity, Date>>;
   /**
    * Where an entity without a stored watermark starts: the `sag` watermark
-   * the bills step just returned. That step fetched every link of every
-   * bill it fetched after this time, so nothing older is missed.
+   * the bills step of this run started from (its `since`), or, on a first
+   * run without one, the watermark that bills step returned. A bills step
+   * with a stored watermark fetched the links only of bills whose Sag
+   * changed, so a link entity must not start later than that step did. A
+   * first run fetched every link of every bill after the watermark it
+   * returned, so nothing older is missed.
    */
   initialSince?: Date;
   /** Progress returned by an earlier call; takes precedence. */

@@ -148,7 +148,7 @@ async function main(): Promise<number> {
     () =>
       ingestLinks(sql, {
         since: stored,
-        initialSince: watermarks.sag ?? stored.sag,
+        initialSince: stored.sag ?? watermarks.sag,
       }),
     (previous) => ingestLinks(sql, { cursor: previous.cursor }),
   );
