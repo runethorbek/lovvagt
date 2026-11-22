@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { parseOdaTimestamp, tryParseOdaTimestamp } from "@/lib/oda";
+import {
+  formatOdaTimestamp,
+  parseOdaTimestamp,
+  tryParseOdaTimestamp,
+} from "@/lib/oda";
 
 const utc = (text: string) => parseOdaTimestamp(text).toISOString();
 
@@ -61,6 +65,49 @@ describe("parseOdaTimestamp", () => {
     expect(tryParseOdaTimestamp(text)).toBeUndefined();
     expect(() => parseOdaTimestamp(text)).toThrow(
       new RangeError("invalid ODA timestamp"),
+    );
+  });
+});
+
+describe("formatOdaTimestamp", () => {
+  const format = (iso: string) => formatOdaTimestamp(new Date(iso));
+
+  it("writes winter time as UTC+1", () => {
+    expect(format("2026-11-18T13:31:51.000Z")).toBe("2026-11-18T14:31:51");
+  });
+
+  it("writes summer time as UTC+2", () => {
+    expect(format("2025-07-25T10:35:04.000Z")).toBe("2025-07-25T12:35:04");
+  });
+
+  it("drops milliseconds, rounding down", () => {
+    expect(format("2025-09-30T09:10:02.999Z")).toBe("2025-09-30T11:10:02");
+  });
+
+  it("crosses midnight and the year in local time", () => {
+    expect(format("2025-12-31T23:00:00.000Z")).toBe("2026-01-01T00:00:00");
+    expect(format("2024-09-30T22:00:00.000Z")).toBe("2024-10-01T00:00:00");
+  });
+
+  it.each([
+    "2026-03-29T00:59:59.000Z",
+    "2026-03-29T01:00:00.000Z",
+    "2026-10-24T23:59:59.000Z",
+    "2026-10-25T02:00:00.000Z",
+    "2026-07-01T10:00:00.000Z",
+  ])("round-trips %s through parseOdaTimestamp", (iso) => {
+    expect(parseOdaTimestamp(format(iso)).toISOString()).toBe(iso);
+  });
+
+  it("writes both instants of the repeated autumn hour the same", () => {
+    // 02:30 local happens at 00:30Z (summer time) and 01:30Z (winter time).
+    expect(format("2026-10-25T00:30:00.000Z")).toBe("2026-10-25T02:30:00");
+    expect(format("2026-10-25T01:30:00.000Z")).toBe("2026-10-25T02:30:00");
+  });
+
+  it("rejects an invalid date", () => {
+    expect(() => formatOdaTimestamp(new Date(Number.NaN))).toThrow(
+      new RangeError("invalid date"),
     );
   });
 });
