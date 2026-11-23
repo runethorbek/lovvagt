@@ -1,26 +1,44 @@
 /**
  * `npx tsx --env-file-if-exists=.env.local scripts/ingest-steps.ts`
  *
- * Runs ingest steps 1 and 2 (sessions and candidate bills,
- * `lib/ingest/steps.ts`) to completion against the database named by
- * `DATABASE_URL` and live ODA, then prints the counts, the candidate count
- * per topic and whether the known 2024-25 bills are tracked as expected.
+ * Runs ingest steps 1 to 3 (sessions, candidate bills, links and actors of
+ * bills, children of tracked bills; `lib/ingest/steps.ts`) to completion
+ * against the database named by `DATABASE_URL` and live ODA, then prints
+ * the counts, the number of ODA requests the steps made, the candidate count
+ * per topic, whether the known 2024-25 bills are tracked as expected, and
+ * the stored and ODA counts of L 211's children with the queries used.
  *
  * Refuses to run unless the environment is `development`. Starts from the
- * stored `sag` watermark if there is one, and stores none: the run lease and
- * watermark bookkeeping belong to `POST /api/ingest`. Prints no connection
- * details and no driver or ODA error messages. Not run in CI.
+ * stored watermarks, and on success records a `completed` `ingest_run` row
+ * with the new ones, so the next run starts from them. It takes no lease:
+ * that belongs to `POST /api/ingest`; do not run it while the route runs.
+ * Prints no connection details and no driver or ODA error messages. Not run
+ * in CI.
  */
 import { ConfigError, config } from "@/lib/config";
 import { executor } from "@/lib/db";
-import { readWatermark } from "@/lib/ingest/repository";
+import {
+  type WatermarkEntity,
+  readWatermarks,
+  recordCompletedRun,
+} from "@/lib/ingest/repository";
 import {
   type Counts,
+  type EntityCounts,
   IngestError,
   ingestBills,
+  ingestChildren,
+  ingestLinks,
   ingestSessions,
 } from "@/lib/ingest/steps";
 import { topicRules } from "@/lib/ingest/topics";
+import {
+  fetchAfstemning,
+  fetchSagDokument,
+  fetchSagstrin,
+  odaBaseUrl,
+  odaQueryUrl,
+} from "@/lib/oda";
 
 /** Known 2024-25 bills (Sag ids) and their expected topics (spec 002). */
 const knownBills = [
@@ -32,6 +50,48 @@ const knownBills = [
   { nummer: "L 210", sagId: 101688, topic: "defence" },
   { nummer: "L 31", sagId: 99215, topic: null },
 ] as const;
+
+/** L 211 (2024-25), whose children are compared with ODA (issue #37). */
+const l211 = 101687;
+
+// ODA requests made through `fetch`, counted by URL prefix. Database
+// requests (Neon over HTTP) also use `fetch` and are not counted.
+let odaRequests = 0;
+const realFetch = globalThis.fetch;
+globalThis.fetch = (input, init) => {
+  const url = input instanceof Request ? input.url : String(input);
+  if (url.startsWith(`${odaBaseUrl}/`)) odaRequests += 1;
+  return realFetch(input, init);
+};
+
+type StepResult = { done: boolean; counts: Counts<string> };
+
+/** Calls a step until it is done, summing its counts. */
+async function untilDone<R extends StepResult>(
+  first: () => Promise<R>,
+  next: (previous: Extract<R, { done: false }>) => Promise<R>,
+): Promise<{ result: R; total: Counts<string>; calls: number }> {
+  let result = await first();
+  let calls = 1;
+  const total: Counts<string> = {};
+  for (;;) {
+    for (const [entity, counts] of Object.entries(result.counts)) {
+      const sum = (total[entity] ??= {
+        fetched: 0,
+        inserted: 0,
+        updated: 0,
+        unchanged: 0,
+      });
+      sum.fetched += counts.fetched;
+      sum.inserted += counts.inserted;
+      sum.updated += counts.updated;
+      sum.unchanged += counts.unchanged;
+    }
+    if (result.done) return { result, total, calls };
+    result = await next(result as Extract<R, { done: false }>);
+    calls += 1;
+  }
+}
 
 function printCounts(counts: Counts<string>): void {
   for (const [
@@ -66,33 +126,63 @@ async function main(): Promise<number> {
     return 1;
   }
 
-  const since = await readWatermark(sql, "sag");
-  console.log(`Bills since: ${since?.toISOString() ?? "(first run)"}`);
-  let result = await ingestBills(sql, { since });
-  let calls = 1;
-  const total: Counts<string> = {};
-  for (;;) {
-    for (const [entity, counts] of Object.entries(result.counts)) {
-      const sum = (total[entity] ??= {
-        fetched: 0,
-        inserted: 0,
-        updated: 0,
-        unchanged: 0,
-      });
-      sum.fetched += counts.fetched;
-      sum.inserted += counts.inserted;
-      sum.updated += counts.updated;
-      sum.unchanged += counts.unchanged;
-    }
-    if (result.done) break;
-    result = await ingestBills(sql, { cursor: result.cursor });
-    calls += 1;
-  }
-  console.log(`Bills (${calls} call(s)):`);
-  printCounts(total);
-  console.log(
-    `New sag watermark (not stored): ${result.watermark?.toISOString() ?? "none"}`,
+  const startedAt = new Date();
+  const stored = await readWatermarks(sql);
+  const watermarks: Partial<Record<WatermarkEntity, Date>> = {};
+  const runCounts: Record<string, Counts<string>> = {
+    sessions: sessions.counts,
+  };
+
+  console.log(`Bills since: ${stored.sag?.toISOString() ?? "(first run)"}`);
+  const bills = await untilDone(
+    () => ingestBills(sql, { since: stored.sag }),
+    (previous) => ingestBills(sql, { cursor: previous.cursor }),
   );
+  console.log(`Bills (${bills.calls} call(s)):`);
+  printCounts(bills.total);
+  runCounts.bills = bills.total;
+  if (bills.result.done && bills.result.watermark !== null)
+    watermarks.sag = bills.result.watermark;
+
+  const links = await untilDone(
+    () =>
+      ingestLinks(sql, {
+        since: stored,
+        initialSince: stored.sag ?? watermarks.sag,
+      }),
+    (previous) => ingestLinks(sql, { cursor: previous.cursor }),
+  );
+  console.log(`Links and actors (${links.calls} call(s)):`);
+  printCounts(links.total);
+  runCounts.links = links.total;
+  if (links.result.done) Object.assign(watermarks, links.result.watermarks);
+
+  console.log(
+    `Children since: ${stored.tracked_sag?.toISOString() ?? "(first run)"}`,
+  );
+  const children = await untilDone(
+    () => ingestChildren(sql, { since: stored }),
+    (previous) => ingestChildren(sql, { cursor: previous.cursor }),
+  );
+  console.log(`Children (${children.calls} call(s)):`);
+  printCounts(children.total);
+  runCounts.children = children.total;
+  if (children.result.done)
+    Object.assign(watermarks, children.result.watermarks);
+
+  console.log(`ODA requests made by the steps: ${odaRequests}`);
+  const writes = [bills.total, links.total, children.total]
+    .flatMap((total) => Object.values(total))
+    .reduce(
+      (sum, counts: EntityCounts) => sum + counts.inserted + counts.updated,
+      0,
+    );
+  console.log(`Rows inserted or updated: ${writes}`);
+
+  const runId = await recordCompletedRun(sql, startedAt, runCounts, watermarks);
+  console.log(`Recorded completed ingest_run ${runId} with watermarks:`);
+  for (const [entity, date] of Object.entries(watermarks))
+    console.log(`  ${entity}: ${date.toISOString()}`);
 
   const perTopic = await sql.query(
     `SELECT topic, count(*)::int AS count FROM tracked_sag
@@ -131,7 +221,81 @@ async function main(): Promise<number> {
       }; expected ${bill.topic ?? "not tracked"}`,
     );
   }
-  return ok ? 0 : 1;
+  return (await compareL211(sql)) && ok ? 0 : 1;
+}
+
+/**
+ * Prints the stored and the ODA counts of L 211's stages, votes, documents
+ * and files, with the queries used, and returns whether they match.
+ */
+async function compareL211(sql: ReturnType<typeof executor>): Promise<boolean> {
+  const sagstrinQuery = { filter: `sagid eq ${l211}` };
+  const afstemningQuery = { filter: `Sagstrin/sagid eq ${l211}` };
+  const sagDokumentQuery = {
+    filter: `sagid eq ${l211}`,
+    expand: "Dokument/Fil",
+  };
+  const sagstrin = await fetchSagstrin(sagstrinQuery);
+  const afstemning = await fetchAfstemning(afstemningQuery);
+  const sagDokument = await fetchSagDokument(sagDokumentQuery);
+  const dokumentIds = new Set(sagDokument.map((row) => row.dokumentid));
+  const filIds = new Set(
+    sagDokument.flatMap((row) =>
+      (row.dokument?.fil ?? []).map((fil) => fil.id),
+    ),
+  );
+
+  const count = async (text: string) => {
+    const [row] = await sql.query(text, [l211]);
+    return Number(row?.count ?? 0);
+  };
+  const checks = [
+    {
+      name: "sagstrin",
+      oda: sagstrin.length,
+      url: odaQueryUrl("Sagstrin", sagstrinQuery),
+      sql: "SELECT count(*)::int AS count FROM sagstrin WHERE sagid = $1",
+    },
+    {
+      name: "afstemning",
+      oda: afstemning.length,
+      url: odaQueryUrl("Afstemning", afstemningQuery),
+      sql: `SELECT count(*)::int AS count FROM afstemning
+            WHERE sagstrinid IN (SELECT id FROM sagstrin WHERE sagid = $1)`,
+    },
+    {
+      name: "sag_dokument",
+      oda: sagDokument.length,
+      url: odaQueryUrl("SagDokument", sagDokumentQuery),
+      sql: "SELECT count(*)::int AS count FROM sag_dokument WHERE sagid = $1",
+    },
+    {
+      name: "dokument",
+      oda: dokumentIds.size,
+      url: "(the SagDokument query above: distinct dokumentid)",
+      sql: `SELECT count(*)::int AS count FROM dokument
+            WHERE id IN (SELECT dokumentid FROM sag_dokument WHERE sagid = $1)`,
+    },
+    {
+      name: "fil",
+      oda: filIds.size,
+      url: "(the SagDokument query above: distinct Dokument/Fil ids)",
+      sql: `SELECT count(*)::int AS count FROM fil
+            WHERE dokumentid IN (SELECT dokumentid FROM sag_dokument WHERE sagid = $1)`,
+    },
+  ];
+  console.log(`L 211 (Sag ${l211}) children, stored vs ODA:`);
+  let ok = true;
+  for (const check of checks) {
+    const stored = await count(check.sql);
+    if (stored !== check.oda) ok = false;
+    console.log(
+      `  ${stored === check.oda ? "ok  " : "FAIL"} ${check.name}: stored ${stored}, ODA ${check.oda}`,
+    );
+    console.log(`       ODA: ${check.url}`);
+    console.log(`       SQL: ${check.sql.replace(/\s+/g, " ")}`);
+  }
+  return ok;
 }
 
 main().then(
