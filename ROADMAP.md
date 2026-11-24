@@ -5,29 +5,33 @@ Update **Where we are** at the end of every work session.
 
 ## Where we are
 
-**Last updated:** 2026-11-23
+**Last updated:** 2026-11-24
 
 **Current phase:** 2 – Ingest (spec 002, epic #32)
 
 **Next action:**
 
-1. Human decides whether #39 (route `POST /api/ingest`, backfill script,
-   `docs/ingest.md`) goes ahead before #38, without the file step. If so,
-   set `agent:ready` on #39 and run `/build-slice 39`. Decisions for
-   `docs/ingest.md` are in a comment on #39.
+1. Human migrates Preview and Production (`0001_initial` and
+   `0002_ingest_run_progress`, `npm run db:migrate -- --environment=<name>`),
+   then checks in Production: `POST /api/ingest` without the secret returns
+   401, `scripts/ingest-until-done.ts <prod-url>` runs until `done: true`,
+   candidate counts per topic match Development (ai 16, defence 20,
+   security 32), and Vercel logs show no timeouts.
 2. Human sends the drafted email to Folketingets Informationscenter
    (`fo@ft.dk`) about automated access to `Fil.filurl` documents, if not
    yet sent.
 3. Human decides on the committee-referral rule kind proposed on #35
    (SagAktør role 11, `Henvist til`).
 
-**Blocked on:** #38 (`needs-human`): `www.ft.dk`, where bill files are
-served, answers automated clients with a Cloudflare challenge (HTTP 403,
-`cf-mitigated: challenge`), both from the dev environment and from a Vercel
-Preview function (probe, 2026-11-20). The ODA API is not affected. #38
-also still needs the Blob usage check (spec 002 prerequisite). ODA's other
-sources do not help: the nightly database backup is metadata only, and the
-anonymous FTP holds only debate transcripts.
+**Blocked on:** #38 (`needs-human`), the last open issue in epic #32:
+`www.ft.dk`, where bill files are served, answers automated clients with a
+Cloudflare challenge (HTTP 403, `cf-mitigated: challenge`), both from the
+dev environment and from a Vercel Preview function (probe, 2026-11-20). The
+ODA API is not affected. #38 also still needs the Blob usage check (spec
+002 prerequisite). ODA's other sources do not help: the nightly database
+backup is metadata only, and the anonymous FTP holds only debate
+transcripts. If the block stays, spec 002 may need amending (the L 211 file
+criterion) so the epic can close.
 
 ## How to resume after a break
 
@@ -81,29 +85,31 @@ Status: ✅ done · 🟡 in progress · ⬜ not started
 Things that are known but not yet handled. Move them into a spec when
 they become relevant.
 
-| Item                                                                                                                                                    | Needed before              |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| Migrate Preview and Production to `0001_initial` (`npm run db:migrate -- --environment=<name>`, human only)                                             | Phase 2 deploy (#39)       |
-| Enable **Allow GitHub Actions to create and approve pull requests** (Settings → Actions → General), human only                                          | Next skills sync           |
-| Preview deployment protection bypass for automated browser tests                                                                                        | Phase 7                    |
-| Dev container: host Git credentials are forwarded, so the scoped GitHub token is not airtight                                                           | Agent automation (phase 8) |
-| Dev container: network firewall (see Anthropic's reference dev container)                                                                               | Agent automation (phase 8) |
-| Restrict Gemini keys to the Generative Language API in Google Cloud (verify)                                                                            | Phase 4                    |
-| `npm audit`: high findings via `@vercel/blob` → `@vercel/oidc` → `@vercel/cli-config` → `zod@4.1.11`; moderate via eslint `minimatch`                   | Any time (upstream fix)    |
-| Blob OIDC token outside a request (Workflow steps, cron): check how Vercel delivers it there (ADR 0005)                                                 | Phase 8                    |
-| Gemini free-tier limits are not published per model; watch the AI Studio rate-limit dashboard (limits are per project)                                  | Phase 4                    |
-| Gemini health check takes ~8 s against a 10 s timeout (`checkTimeoutMs`); raise it or give Gemini its own timeout if it starts timing out               | Phase 4                    |
-| `www.ft.dk` bill files blocked by a Cloudflare challenge (dev and Vercel); ask Folketinget, do not circumvent                                           | #38, phase 3               |
-| ODA timestamps verified as Copenhagen time in winter only; re-check summer time after 2027-03-28                                                        | `docs/ingest.md` (#39)     |
-| Committee-referral rule kind (SagAktør role 11, `Henvist til`) proposed on #35: human decision                                                          | Topic rule tuning          |
-| Ingest follow-ups (#51 review): split `lib/ingest/steps.ts` (~1,450 lines) into bills/links/children modules; drop the duplicate first-run phase-2 skip | Any time                   |
-| Ingest guard (#50 review): fail if an ODA page does not advance the id cursor (would loop without a deadline)                                           | #39                        |
-| Rows deleted in ODA are not removed (out of scope in spec 002); record what is observed                                                                 | `docs/ingest.md` (#39)     |
-| ODA client follow-ups (#46 review): abort while waiting for the lock; redirect hops; `fetchDokument`/`fetchFil` tests                                   | Phase 8                    |
-| Preview `CRON_SECRET` replaced 2026-11-20 (Sensitive, cannot be read back); keep the value outside Vercel                                               | Any Preview check          |
-| ODA bulk sources: nightly `oda.bak` (SQL Server, metadata) and debate transcripts on `ftp://oda.ft.dk/ODAXML/Referat/`                                  | Phase 6 (transcripts)      |
-| Consider moving the repo into the WSL file system if the container feels slow                                                                           | Any time                   |
-| Vercel Hobby is for non-commercial use; revisit if Lovvagt becomes a product                                                                            | Before any commercial use  |
+| Item                                                                                                                                                                                                                  | Needed before              |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| Migrate Preview and Production to `0001_initial` (`npm run db:migrate -- --environment=<name>`, human only)                                                                                                           | Phase 2 deploy             |
+| Enable **Allow GitHub Actions to create and approve pull requests** (Settings → Actions → General), human only                                                                                                        | Next skills sync           |
+| Preview deployment protection bypass for automated browser tests                                                                                                                                                      | Phase 7                    |
+| Dev container: host Git credentials are forwarded, so the scoped GitHub token is not airtight                                                                                                                         | Agent automation (phase 8) |
+| Dev container: network firewall (see Anthropic's reference dev container)                                                                                                                                             | Agent automation (phase 8) |
+| Restrict Gemini keys to the Generative Language API in Google Cloud (verify)                                                                                                                                          | Phase 4                    |
+| `npm audit`: high findings via `@vercel/blob` → `@vercel/oidc` → `@vercel/cli-config` → `zod@4.1.11`; moderate via eslint `minimatch`                                                                                 | Any time (upstream fix)    |
+| Blob OIDC token outside a request (Workflow steps, cron): check how Vercel delivers it there (ADR 0005)                                                                                                               | Phase 8                    |
+| Gemini free-tier limits are not published per model; watch the AI Studio rate-limit dashboard (limits are per project)                                                                                                | Phase 4                    |
+| Gemini health check takes ~8 s against a 10 s timeout (`checkTimeoutMs`); raise it or give Gemini its own timeout if it starts timing out                                                                             | Phase 4                    |
+| `www.ft.dk` bill files blocked by a Cloudflare challenge (dev and Vercel); ask Folketinget, do not circumvent                                                                                                         | #38, phase 3               |
+| ODA timestamps verified as Copenhagen time in winter only; re-check summer time after 2027-03-28 (noted in `docs/ingest.md`)                                                                                          | 2027-03-28                 |
+| Committee-referral rule kind (SagAktør role 11, `Henvist til`) proposed on #35: human decision                                                                                                                        | Topic rule tuning          |
+| Ingest follow-ups (#51 review): split `lib/ingest/steps.ts` (~1,450 lines) into bills/links/children modules; drop the duplicate first-run phase-2 skip                                                               | Any time                   |
+| Ingest route follow-ups (#53 review): take the lease and read the run id in one statement (a failed second query blocks calls with 409 for up to 10 min); verify the Preview `vercel curl` syntax in `docs/ingest.md` | Phase 8                    |
+| Full backfill from an empty database through `POST /api/ingest` not yet run (dev data came from `scripts/ingest-steps.ts`); the Production backfill will be the first                                                 | Production backfill        |
+| Ingest guard (#50 review): fail if an ODA page does not advance the id cursor (would loop until the time budget)                                                                                                      | Phase 8                    |
+| Rows deleted in ODA are not removed (out of scope in spec 002, noted in `docs/ingest.md`)                                                                                                                             | Phase 6 (events)           |
+| ODA client follow-ups (#46 review): abort while waiting for the lock; redirect hops; `fetchDokument`/`fetchFil` tests                                                                                                 | Phase 8                    |
+| Preview `CRON_SECRET` replaced 2026-11-20 (Sensitive, cannot be read back); keep the value outside Vercel                                                                                                             | Any Preview check          |
+| ODA bulk sources: nightly `oda.bak` (SQL Server, metadata) and debate transcripts on `ftp://oda.ft.dk/ODAXML/Referat/`                                                                                                | Phase 6 (transcripts)      |
+| Consider moving the repo into the WSL file system if the container feels slow                                                                                                                                         | Any time                   |
+| Vercel Hobby is for non-commercial use; revisit if Lovvagt becomes a product                                                                                                                                          | Before any commercial use  |
 
 ## Working agreements
 
@@ -123,6 +129,12 @@ they become relevant.
 
 Newest first. One or two lines per session.
 
+- **2026-11-24** – Agent implemented #39 (#53) with `/build-slice` (one
+  review round, PASS): `POST /api/ingest` with lease, 240 s budget and
+  progress saved across calls (migration `0002`), `scripts/ingest-until-done.ts`,
+  `docs/ingest.md`. Development migrated; local catch-up then a second call
+  with zero writes; live checks of 409 and multi-call resume. #38 is the
+  only open issue in epic #32.
 - **2026-11-23** – Answered the #51 review questions with live ODA checks:
   15 votes show `Afstemning.opdateringsdato` at or after their newest
   `Stemme`; `Fil` rows are identical from both queries. Notes for
