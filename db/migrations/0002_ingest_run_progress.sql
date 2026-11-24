@@ -1,0 +1,11 @@
+-- 0002: where a multi-call ingest run (POST /api/ingest) continues. See
+-- lib/ingest/run.ts and docs/ingest.md.
+--
+-- A backfill spans several calls, each with its own ingest_run row. A call
+-- that stops on its time budget, fails or expires leaves progress here: the
+-- step to run next, that step's cursor, the watermarks the run started from
+-- and those its finished steps produced. The next call continues from the
+-- latest row that is completed or has progress. Watermarks are written to
+-- the watermarks column only by the call that completes the run, so a
+-- stopped or failed call never moves them. NULL means nothing to continue.
+ALTER TABLE ingest_run ADD COLUMN progress jsonb;
