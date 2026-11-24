@@ -105,6 +105,11 @@ Everything else (code, comments, docs, issues, commits) is in English.
   (enforced by `tests/unit/boundaries.test.ts`) or call `config.gemini()`.
   Catch `RateLimitError` (HTTP 429) to back off. Never pass SDK error
   messages on, and never log the key.
+- Talk to ODA only through the ODA client in `lib/oda/` (sequential
+  requests, timeouts, retries, generic `User-Agent`). No other source file
+  may name the ODA host (enforced by `tests/unit/boundaries.test.ts`).
+  Never pass ODA error messages on. Ingest runs through `POST /api/ingest`
+  (`lib/ingest/run.ts`); see `docs/ingest.md`.
 
 ## Workflow rules
 
