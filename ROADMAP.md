@@ -87,7 +87,7 @@ they become relevant.
 
 | Item                                                                                                                                                                                                                  | Needed before              |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| Migrate Preview and Production to `0001_initial` (`npm run db:migrate -- --environment=<name>`, human only)                                                                                                           | Phase 2 deploy             |
+| Migrate Preview and Production to `0001_initial` and `0002_ingest_run_progress` (`npm run db:migrate -- --environment=<name>`, human only)                                                                            | Phase 2 deploy             |
 | Enable **Allow GitHub Actions to create and approve pull requests** (Settings → Actions → General), human only                                                                                                        | Next skills sync           |
 | Preview deployment protection bypass for automated browser tests                                                                                                                                                      | Phase 7                    |
 | Dev container: host Git credentials are forwarded, so the scoped GitHub token is not airtight                                                                                                                         | Agent automation (phase 8) |
