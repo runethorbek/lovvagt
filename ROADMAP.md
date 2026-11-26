@@ -5,7 +5,7 @@ Update **Where we are** at the end of every work session.
 
 ## Where we are
 
-**Last updated:** 2026-11-24
+**Last updated:** 2026-11-26
 
 **Current phase:** 2 – Ingest (spec 002, epic #32)
 
@@ -17,21 +17,23 @@ Update **Where we are** at the end of every work session.
    401, `scripts/ingest-until-done.ts <prod-url>` runs until `done: true`,
    candidate counts per topic match Development (ai 16, defence 20,
    security 32), and Vercel logs show no timeouts.
-2. Human sends the drafted email to Folketingets Informationscenter
-   (`fo@ft.dk`) about automated access to `Fil.filurl` documents, if not
-   yet sent.
+2. When Folketinget confirms access: check from home that the L 211 file
+   URL returns a PDF (not 403), decide how files reach the Production Blob
+   store (options on #38; recommended: home script sends bytes to an
+   authorised Production route), amend spec 002 (file step runs from the
+   allowlisted home connection, pacing, working hours) and update #38.
 3. Human decides on the committee-referral rule kind proposed on #35
    (SagAktør role 11, `Henvist til`).
 
-**Blocked on:** #38 (`needs-human`), the last open issue in epic #32:
+**Blocked on:** #38 (`needs-human`), the last open issue in epic #32.
 `www.ft.dk`, where bill files are served, answers automated clients with a
-Cloudflare challenge (HTTP 403, `cf-mitigated: challenge`), both from the
-dev environment and from a Vercel Preview function (probe, 2026-11-20). The
-ODA API is not affected. #38 also still needs the Blob usage check (spec
-002 prerequisite). ODA's other sources do not help: the nightly database
-backup is metadata only, and the anonymous FTP holds only debate
-transcripts. If the block stays, spec 002 may need amending (the L 211 file
-criterion) so the epic can close.
+Cloudflare challenge (HTTP 403). Folketinget offered access by IP allowlist;
+the human sent the home connection's details on 2026-11-26 and asked
+whether access by User-Agent is possible instead. Waiting for their
+confirmation. Conditions: large downloads outside Monday–Friday 08–17 and
+1–2 s between requests. Vercel has no fixed outgoing IP on Hobby, so
+unless the User-Agent is allowed, the file step must run from home (details
+on #38). #38 also still needs the Blob usage check (spec 002 prerequisite).
 
 ## How to resume after a break
 
@@ -97,7 +99,7 @@ they become relevant.
 | Blob OIDC token outside a request (Workflow steps, cron): check how Vercel delivers it there (ADR 0005)                                                                                                               | Phase 8                    |
 | Gemini free-tier limits are not published per model; watch the AI Studio rate-limit dashboard (limits are per project)                                                                                                | Phase 4                    |
 | Gemini health check takes ~8 s against a 10 s timeout (`checkTimeoutMs`); raise it or give Gemini its own timeout if it starts timing out                                                                             | Phase 4                    |
-| `www.ft.dk` bill files blocked by a Cloudflare challenge (dev and Vercel); ask Folketinget, do not circumvent                                                                                                         | #38, phase 3               |
+| `www.ft.dk` access by IP allowlist (home connection, details sent 2026-11-26): if the home IP changes, send Folketinget the new one; do not circumvent the challenge                                                  | #38, phase 3               |
 | ODA timestamps verified as Copenhagen time in winter only; re-check summer time after 2027-03-28 (noted in `docs/ingest.md`)                                                                                          | 2027-03-28                 |
 | Committee-referral rule kind (SagAktør role 11, `Henvist til`) proposed on #35: human decision                                                                                                                        | Topic rule tuning          |
 | Ingest follow-ups (#51 review): split `lib/ingest/steps.ts` (~1,450 lines) into bills/links/children modules; drop the duplicate first-run phase-2 skip                                                               | Any time                   |
@@ -110,6 +112,7 @@ they become relevant.
 | ODA bulk sources: nightly `oda.bak` (SQL Server, metadata) and debate transcripts on `ftp://oda.ft.dk/ODAXML/Referat/`                                                                                                | Phase 6 (transcripts)      |
 | Consider moving the repo into the WSL file system if the container feels slow                                                                                                                                         | Any time                   |
 | Vercel Hobby is for non-commercial use; revisit if Lovvagt becomes a product                                                                                                                                          | Before any commercial use  |
+| Production Blob from a home script: CLAUDE.md forbids production credentials locally; decide the route (options on #38)                                                                                               | #38                        |
 
 ## Working agreements
 
@@ -129,6 +132,12 @@ they become relevant.
 
 Newest first. One or two lines per session.
 
+- **2026-11-26** – Folketinget's webmaster offered access to `www.ft.dk`
+  files by IP allowlist (conditions: outside Mon–Fri 08–17, 1–2 s between
+  requests); human sent the home connection's details and asked about
+  User-Agent access. Requirements and open decisions recorded on #38 and
+  #32: file step from home (no fixed Vercel IP on Hobby), Production Blob
+  target to decide, spec 002 to amend.
 - **2026-11-24** – Agent implemented #39 (#53) with `/build-slice` (one
   review round, PASS): `POST /api/ingest` with lease, 240 s budget and
   progress saved across calls (migration `0002`), `scripts/ingest-until-done.ts`,
